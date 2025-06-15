@@ -1,3 +1,8 @@
+import { StorageManager } from './utils/StorageManager.js';
+import { ListManager } from './components/ListManager.js';
+import { DumpList } from './components/DumpList.js';
+import { TabManager } from './components/TabManager.js';
+
 // データストレージ管理
 class StorageManager {
     static saveData(key, data) {
@@ -7,6 +12,61 @@ class StorageManager {
     static loadData(key) {
         const data = localStorage.getItem(key);
         return data ? JSON.parse(data) : [];
+    }
+}
+
+// リスト管理基本クラス
+class ListManager {
+    constructor(key) {
+        this.key = key;
+        this.element = document.getElementById(`${key}List`);
+        this.list = StorageManager.loadData(key);
+    }
+
+    addItem(text) {
+        const item = {
+            id: Date.now(),
+            text: text,
+            timestamp: new Date().toLocaleString()
+        };
+        
+        this.list.push(item);
+        StorageManager.saveData(this.key, this.list);
+        this.render();
+    }
+
+    removeItem(id) {
+        this.list = this.list.filter(item => item.id !== id);
+        StorageManager.saveData(this.key, this.list);
+        this.render();
+    }
+
+    render() {
+        this.element.innerHTML = '';
+        this.list.forEach(item => {
+            const li = document.createElement('li');
+            li.className = 'flex justify-between items-center p-3 border-b border-gray-200';
+            
+            const content = document.createElement('div');
+            content.className = 'flex-1';
+            content.innerHTML = `
+                <div class="text-gray-900">${item.text}</div>
+                <div class="text-sm text-gray-500">${item.timestamp}</div>
+            `;
+
+            const actions = document.createElement('div');
+            actions.className = 'flex space-x-2';
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'text-red-500 hover:text-red-700';
+            deleteBtn.innerHTML = '削除';
+            deleteBtn.onclick = () => this.removeItem(item.id);
+            actions.appendChild(deleteBtn);
+
+            li.appendChild(content);
+            li.appendChild(actions);
+            this.element.appendChild(li);
+        });
     }
 }
 
@@ -291,24 +351,39 @@ class TabManager {
         });
 
         // リスト追加ボタン
-        document.getElementById('dumpAddButton').onclick = () => {
+        document.getElementById('dumpAddButton').addEventListener('click', () => {
             const input = document.getElementById('dumpInput');
             if (input.value.trim()) {
                 dumpList.addItem(input.value.trim());
                 input.value = '';
             }
-        };
+        });
 
-        document.getElementById('todoAddButton').onclick = () => {
+        document.getElementById('todoAddButton').addEventListener('click', () => {
             const input = document.getElementById('todoInput');
             if (input.value.trim()) {
                 todoList.addItem(input.value.trim());
                 input.value = '';
             }
-        };
+        });
+
+        // キーイベントリスナー
+        document.getElementById('dumpInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && e.target.value.trim()) {
+                dumpList.addItem(e.target.value.trim());
+                e.target.value = '';
+            }
+        });
+
+        document.getElementById('todoInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && e.target.value.trim()) {
+                todoList.addItem(e.target.value.trim());
+                e.target.value = '';
+            }
+        });
     }
 
-    switchTab(tabId) {
+    async switchTab(tabId) {
         // タブボタンの更新
         document.querySelectorAll('.tab-button').forEach(button => {
             button.classList.toggle('active', button.dataset.tab === tabId);
@@ -319,8 +394,22 @@ class TabManager {
         });
 
         // コンテンツの切り替え
-        document.querySelectorAll('.tab-content').forEach(content => {
-            content.classList.toggle('hidden', content.id !== `${tabId}Content`);
+        const currentContent = document.querySelector(`#${this.activeTab}Content`);
+        const newContent = document.querySelector(`#${tabId}Content`);
+
+        // 現在のコンテンツをフェードアウト
+        currentContent.style.opacity = '0';
+        await new Promise(resolve => setTimeout(resolve, 300));
+        currentContent.classList.add('hidden');
+
+        // 新しいコンテンツを表示
+        newContent.classList.remove('hidden');
+        newContent.style.opacity = '0';
+        newContent.style.display = 'block';
+        
+        // フェードインアニメーション
+        requestAnimationFrame(() => {
+            newContent.style.opacity = '1';
         });
 
         this.activeTab = tabId;
@@ -330,96 +419,37 @@ class TabManager {
         dumpList.render();
         todoList.render();
         completedList.render();
+    }
 
-        // イベントリスナーの設定
-        document.addEventListener('DOMContentLoaded', () => {
-            const dumpList = new DumpList();
-            const todoList = new TodoList();
-            const completedList = new CompletedList();
-
-            // エクスポートボタンのイベントリスナー
-            document.getElementById('exportButton').addEventListener('click', () => {
-                const exportButton = document.getElementById('exportButton');
-                exportButton.textContent = 'エクスポート中...';
-
-                try {
-                    const now = new Date();
-                    const timestamp = now.toLocaleString();
-                    const filename = `list_export_${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}${String(now.getSeconds()).padStart(2, '0')}.md`;
-
-                    // Markdown形式でデータを整形
-                    const markdown = `# My Task Management Export - ${timestamp}\n\n## ダンプリスト\n\n${dumpList.list.map(item => `* ${item.text}`).join('\n')}\n\n## ToDoリスト\n\n| 優先度 | タスク内容 |\n| :----- | :--------- |\n${todoList.list.map(item => `| ${item.priority} | ${item.text} |`).join('\n')}\n\n## 完了リスト\n\n| 完了日       | タスク内容 | (元の優先度) |\n| :----------- | :--------- | :----------- |\n${completedList.list.map(item => `| ${new Date(item.completedAt).toLocaleDateString()} | ${item.text} | (${item.priority}) |`).join('\n')}`;
-
-                    // ダウンロードリンクを作成
-                    const blob = new Blob([markdown], { type: 'text/markdown' });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = filename;
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
-
-                    // フィードバック
-                    setTimeout(() => {
-                        exportButton.textContent = 'データをエクスポート';
-                        alert('データをエクスポートしました。');
-                    }, 1000);
-                } catch (error) {
-                    console.error('エクスポートエラー:', error);
-                    alert('エクスポート中にエラーが発生しました。');
-                    exportButton.textContent = 'データをエクスポート';
+    // ツールチップの表示制御
+    setupTooltips() {
+        document.querySelectorAll('.tooltip').forEach(tooltip => {
+            tooltip.addEventListener('mouseenter', (e) => {
+                const tooltiptext = tooltip.querySelector('.tooltiptext');
+                if (tooltiptext) {
+                    tooltiptext.style.visibility = 'visible';
+                    tooltiptext.style.opacity = '1';
                 }
             });
 
-            // クリアボタンのイベントリスナー
-            document.getElementById('clearButton').addEventListener('click', () => {
-                const clearButton = document.getElementById('clearButton');
-                clearButton.textContent = 'クリア中...';
-
-                if (confirm('本当に全てのリストをクリアしますか？この操作は元に戻せません。')) {
-                    try {
-                        // ローカルストレージからデータを削除
-                        localStorage.removeItem('dump');
-                        localStorage.removeItem('todo');
-                        localStorage.removeItem('completed');
-
-                        // DOMのリストをクリア
-                        document.getElementById('dumpList').innerHTML = '';
-                        document.getElementById('todoList').innerHTML = '';
-                        document.getElementById('completedList').innerHTML = '';
-
-                        // タブのリセット
-                        document.getElementById('dumpTab').classList.add('active');
-                        document.getElementById('todoTab').classList.remove('active');
-                        document.getElementById('completedTab').classList.remove('active');
-
-                        // コンテンツの表示をリセット
-                        document.getElementById('dumpContent').classList.add('active');
-                        document.getElementById('todoContent').classList.remove('active');
-                        document.getElementById('completedContent').classList.remove('active');
-
-                        // フィードバック
-                        setTimeout(() => {
-                            clearButton.textContent = '全リストをクリア';
-                            alert('全てのリストをクリアしました。');
-                        }, 1000);
-                    } catch (error) {
-                        console.error('クリアエラー:', error);
-                        alert('リストのクリア中にエラーが発生しました。');
-                        clearButton.textContent = '全リストをクリア';
-                    }
-                } else {
-                    clearButton.textContent = '全リストをクリア';
+            tooltip.addEventListener('mouseleave', (e) => {
+                const tooltiptext = tooltip.querySelector('.tooltiptext');
+                if (tooltiptext) {
+                    tooltiptext.style.visibility = 'hidden';
+                    tooltiptext.style.opacity = '0';
                 }
             });
         });
     }
 }
 
-// インスタンス化
+// グローバル変数の初期化
 const dumpList = new DumpList();
 const todoList = new TodoList();
 const completedList = new CompletedList();
 const tabManager = new TabManager();
+
+// DOMContentLoadedイベントでツールチップをセットアップ
+document.addEventListener('DOMContentLoaded', () => {
+    tabManager.setupTooltips();
+});
