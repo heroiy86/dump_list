@@ -1,4 +1,4 @@
-import { StorageManager } from '../../utils/StorageManager.js';
+import { StorageManager } from '../utils/StorageManager.js';
 
 export class ListManager {
     constructor(key) {
