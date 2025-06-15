@@ -1,3 +1,5 @@
+import { StorageManager } from '../utils/StorageManager.js';
+
 export class ListManager {
     constructor(key) {
         this.key = key;
