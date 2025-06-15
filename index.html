@@ -138,24 +138,8 @@
     <script type="module" src="./js/app.js"></script>
     
     <script>
-        // Set active tab from URL hash or default to dump
-        function setInitialTab() {
-            const hash = window.location.hash.substring(1) || 'dump';
-            const tab = document.querySelector(`button[data-tab="${hash}"]`);
-            if (tab) tab.click();
-        }
-
-        // Add clear all completed functionality
+        // Clear all completed functionality
         document.addEventListener('DOMContentLoaded', () => {
-            // Set initial tab
-            setInitialTab();
-            
-            // Update URL hash when tab changes
-            document.querySelectorAll('[data-tab]').forEach(tab => {
-                tab.addEventListener('click', () => {
-                    window.location.hash = tab.dataset.tab;
-                });
-            });
             const clearCompletedBtn = document.getElementById('clearCompletedBtn');
             if (clearCompletedBtn) {
                 clearCompletedBtn.addEventListener('click', () => {
@@ -173,18 +157,6 @@
                     }
                 });
             }
-            
-            // Auto-resize textareas
-            document.querySelectorAll('textarea').forEach(textarea => {
-                const resizeTextarea = () => {
-                    textarea.style.height = 'auto';
-                    textarea.style.height = textarea.scrollHeight + 'px';
-                };
-                
-                textarea.addEventListener('input', resizeTextarea);
-                // Initial resize
-                setTimeout(resizeTextarea, 0);
-            });
         });
     </script>
 </body>
