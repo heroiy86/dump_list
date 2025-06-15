@@ -78,5 +78,3 @@ export class CompletedList extends ListManager {
         });
     }
 }
-
-export { CompletedList };
