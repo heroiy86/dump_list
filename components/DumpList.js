@@ -10,7 +10,7 @@ export class DumpList extends ListManager {
         if (item) {
             this.removeItem(id);
             const todoList = new TodoList();
-            todoList.addItem(item.text, 'medium');
+            todoList.addItem(item.title, item.details, 'medium');
         }
     }
 
@@ -22,10 +22,21 @@ export class DumpList extends ListManager {
             
             const content = document.createElement('div');
             content.className = 'flex-1';
-            content.innerHTML = `
-                <div class="text-gray-900">${item.text}</div>
-                <div class="text-sm text-gray-500">${new Date(item.timestamp).toLocaleString()}</div>
-            `;
+            const titleDiv = document.createElement('div');
+            titleDiv.className = 'text-gray-900 font-medium';
+            titleDiv.textContent = item.title;
+            
+            const detailsDiv = document.createElement('div');
+            detailsDiv.className = 'text-gray-600 text-sm mt-1';
+            detailsDiv.textContent = item.details || '';
+            
+            const timestampDiv = document.createElement('div');
+            timestampDiv.className = 'text-xs text-gray-400 mt-1';
+            timestampDiv.textContent = new Date(item.timestamp).toLocaleString();
+            
+            content.appendChild(titleDiv);
+            if (item.details) content.appendChild(detailsDiv);
+            content.appendChild(timestampDiv);
 
             const actions = document.createElement('div');
             actions.className = 'flex space-x-2';

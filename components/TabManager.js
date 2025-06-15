@@ -18,33 +18,38 @@ export class TabManager {
 
         // リスト追加ボタン
         document.getElementById('dumpAddButton').addEventListener('click', () => {
-            const input = document.getElementById('dumpInput');
-            if (input.value.trim()) {
-                dumpList.addItem(input.value.trim());
-                input.value = '';
+            const titleInput = document.getElementById('dumpTitleInput');
+            const detailsInput = document.getElementById('dumpDetailsInput');
+            
+            if (titleInput.value.trim()) {
+                dumpList.addItem(titleInput.value.trim(), detailsInput.value.trim());
+                titleInput.value = '';
+                detailsInput.value = '';
+                titleInput.focus();
             }
         });
 
-        document.getElementById('todoAddButton').addEventListener('click', () => {
-            const input = document.getElementById('todoInput');
-            if (input.value.trim()) {
-                todoList.addItem(input.value.trim());
-                input.value = '';
-            }
-        });
-
-        // キーイベントリスナー
-        document.getElementById('dumpInput').addEventListener('keypress', (e) => {
+        // エンターキーで追加（タイトル入力中）
+        document.getElementById('dumpTitleInput').addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && e.target.value.trim()) {
-                dumpList.addItem(e.target.value.trim());
+                const detailsInput = document.getElementById('dumpDetailsInput');
+                dumpList.addItem(e.target.value.trim(), detailsInput.value.trim());
                 e.target.value = '';
+                detailsInput.value = '';
             }
         });
 
-        document.getElementById('todoInput').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && e.target.value.trim()) {
-                todoList.addItem(e.target.value.trim());
-                e.target.value = '';
+        // エンターキーで追加（詳細入力中）
+        document.getElementById('dumpDetailsInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && e.ctrlKey) {
+                e.preventDefault();
+                const titleInput = document.getElementById('dumpTitleInput');
+                if (titleInput.value.trim()) {
+                    dumpList.addItem(titleInput.value.trim(), e.target.value.trim());
+                    titleInput.value = '';
+                    e.target.value = '';
+                    titleInput.focus();
+                }
             }
         });
     }

@@ -6,10 +6,11 @@ class CompletedList extends ListManager {
         super('completed');
     }
 
-    addItem(text, originalPriority) {
+    addItem(title, details = '', originalPriority = 'medium') {
         const item = {
             id: Date.now(),
-            text: text,
+            title: title,
+            details: details,
             originalPriority: originalPriority,
             completedAt: new Date().toLocaleString()
         };
@@ -17,6 +18,7 @@ class CompletedList extends ListManager {
         this.list.push(item);
         StorageManager.saveData('completed', this.list);
         this.render();
+        return item;
     }
 
     moveToTodo(id) {
@@ -36,13 +38,24 @@ class CompletedList extends ListManager {
             
             const content = document.createElement('div');
             content.className = 'flex-1';
-            content.innerHTML = `
-                <div class="text-gray-900 line-through">${item.text}</div>
-                <div class="text-sm text-gray-500">
-                    完了日: ${item.completedAt}<br>
-                    優先度: ${item.originalPriority}
-                </div>
+            const titleDiv = document.createElement('div');
+            titleDiv.className = 'text-gray-900 font-medium line-through';
+            titleDiv.textContent = item.title;
+            
+            const detailsDiv = document.createElement('div');
+            detailsDiv.className = 'text-gray-600 text-sm mt-1 line-through';
+            detailsDiv.textContent = item.details || '';
+            
+            const metaDiv = document.createElement('div');
+            metaDiv.className = 'text-sm text-gray-500 mt-2';
+            metaDiv.innerHTML = `
+                完了日: ${item.completedAt}<br>
+                優先度: ${item.originalPriority}
             `;
+            
+            content.appendChild(titleDiv);
+            if (item.details) content.appendChild(detailsDiv);
+            content.appendChild(metaDiv);
 
             const actions = document.createElement('div');
             actions.className = 'flex space-x-2';

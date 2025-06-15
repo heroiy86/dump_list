@@ -6,17 +6,20 @@ class TodoList extends ListManager {
         super('todo');
     }
 
-    addItem(text, priority = 'medium') {
+    addItem(title, details = '', priority = 'medium') {
         const item = {
             id: Date.now(),
-            text: text,
+            title: title,
+            details: details,
             priority: priority,
-            timestamp: new Date().toLocaleString()
+            timestamp: new Date().toLocaleString(),
+            completed: false
         };
         
         this.list.push(item);
         StorageManager.saveData('todo', this.list);
         this.render();
+        return item;
     }
 
     toggleComplete(id) {
@@ -24,7 +27,7 @@ class TodoList extends ListManager {
         if (item) {
             this.removeItem(id);
             const completedList = new CompletedList();
-            completedList.addItem(item.text, item.priority);
+            completedList.addItem(item.title, item.details, item.priority);
         }
     }
 
@@ -45,17 +48,25 @@ class TodoList extends ListManager {
         if (item) {
             const li = document.querySelector(`[data-item-id="${id}"]`);
             const contentDiv = li.querySelector('.todo-content');
-            const editInput = document.createElement('input');
-            editInput.type = 'text';
-            editInput.value = item.text;
-            editInput.className = 'w-full p-2 border rounded';
+            
+            const titleInput = document.createElement('input');
+            titleInput.type = 'text';
+            titleInput.placeholder = 'タイトル';
+            titleInput.value = item.title;
+            titleInput.className = 'w-full p-2 mb-2 border rounded';
+            
+            const detailsInput = document.createElement('textarea');
+            detailsInput.placeholder = '詳細（任意）';
+            detailsInput.value = item.details || '';
+            detailsInput.className = 'w-full p-2 border rounded h-20';
             
             const saveBtn = document.createElement('button');
-            saveBtn.className = 'ml-2 px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600';
+            saveBtn.className = 'mt-2 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600';
             saveBtn.textContent = '保存';
             
             saveBtn.onclick = () => {
-                item.text = editInput.value;
+                item.title = titleInput.value.trim();
+                item.details = detailsInput.value.trim();
                 StorageManager.saveData('todo', this.list);
                 this.render();
             };

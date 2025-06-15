@@ -5,16 +5,19 @@ export class ListManager {
         this.list = StorageManager.loadData(key);
     }
 
-    addItem(text) {
+    addItem(title, details = '') {
         const item = {
             id: Date.now(),
-            text: text,
-            timestamp: new Date().toLocaleString()
+            title: title,
+            details: details,
+            timestamp: new Date().toLocaleString(),
+            completed: false
         };
         
         this.list.push(item);
         StorageManager.saveData(this.key, this.list);
         this.render();
+        return item;
     }
 
     removeItem(id) {
@@ -31,10 +34,22 @@ export class ListManager {
             
             const content = document.createElement('div');
             content.className = 'flex-1';
-            content.innerHTML = `
-                <div class="text-gray-900">${item.text}</div>
-                <div class="text-sm text-gray-500">${item.timestamp}</div>
-            `;
+            
+            const titleDiv = document.createElement('div');
+            titleDiv.className = 'text-gray-900 font-medium';
+            titleDiv.textContent = item.title;
+            
+            const detailsDiv = document.createElement('div');
+            detailsDiv.className = 'text-gray-600 text-sm mt-1';
+            detailsDiv.textContent = item.details || '詳細なし';
+            
+            const timestampDiv = document.createElement('div');
+            timestampDiv.className = 'text-xs text-gray-400 mt-1';
+            timestampDiv.textContent = item.timestamp;
+            
+            content.appendChild(titleDiv);
+            if (item.details) content.appendChild(detailsDiv);
+            content.appendChild(timestampDiv);
 
             const actions = document.createElement('div');
             actions.className = 'flex space-x-2';
