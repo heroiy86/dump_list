@@ -1,5 +1,8 @@
 export class TabManager {
-    constructor() {
+    constructor(dumpList, todoList, completedList) {
+        this.dumpList = dumpList;
+        this.todoList = todoList;
+        this.completedList = completedList;
         this.activeTab = 'dump';
         this.setupEventListeners();
         this.initializeTabs();
@@ -131,9 +134,9 @@ export class TabManager {
     loadInitialContent() {
         console.log('Loading initial content...');
         try {
-            dumpList.render();
-            todoList.render();
-            completedList.render();
+            this.dumpList.render();
+            this.todoList.render();
+            this.completedList.render();
             console.log('Initial content loaded');
         } catch (error) {
             console.error('Error loading initial content:', error);

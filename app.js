@@ -13,10 +13,10 @@ function initApp() {
         console.log('Initializing application...');
         
         // インスタンスの初期化
-        dumpList = new DumpList();
-        todoList = new TodoList();
-        completedList = new CompletedList();
-        tabManager = new TabManager();
+        const dumpList = new DumpList();
+        const todoList = new TodoList();
+        const completedList = new CompletedList();
+        const tabManager = new TabManager(dumpList, todoList, completedList);
         
         // デバッグ用にグローバルに公開
         window.app = {
@@ -27,6 +27,13 @@ function initApp() {
         };
         
         console.log('Application initialized successfully');
+        
+        // 初期レンダリングを実行
+        setTimeout(() => {
+            dumpList.render();
+            todoList.render();
+            completedList.render();
+        }, 100);
         
     } catch (error) {
         console.error('Failed to initialize application:', error);
