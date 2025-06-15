@@ -1,7 +1,7 @@
 import { ListManager } from './ListManager.js';
 import { StorageManager } from '../utils/StorageManager.js';
 
-class CompletedList extends ListManager {
+export class CompletedList extends ListManager {
     constructor() {
         super('completed');
     }

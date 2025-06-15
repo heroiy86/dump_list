@@ -1,7 +1,7 @@
 import { ListManager } from './ListManager.js';
 import { StorageManager } from '../utils/StorageManager.js';
 
-class TodoList extends ListManager {
+export class TodoList extends ListManager {
     constructor() {
         super('todo');
     }
