@@ -138,6 +138,13 @@ export class TodoList extends ListManager {
         editButton.title = '編集';
         editButton.onclick = (e) => this.startEditing(item.id, e);
         
+        // Priority button
+        const priorityButton = document.createElement('button');
+        priorityButton.className = 'text-xs bg-purple-500 text-white px-2 py-1 rounded shadow';
+        priorityButton.innerHTML = '<i class="fas fa-flag"></i>';
+        priorityButton.title = '優先度を変更';
+        priorityButton.onclick = (e) => this.changePriority(item.id, e);
+        
         // Delete button - Always visible with icon only
         const deleteButton = document.createElement('button');
         deleteButton.className = 'text-xs bg-red-500 text-white px-2 py-1 rounded shadow';
