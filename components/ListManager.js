@@ -27,42 +27,78 @@ export class ListManager {
     }
 
     render() {
-        this.element.innerHTML = '';
-        this.list.forEach(item => {
-            const li = document.createElement('li');
-            li.className = 'flex justify-between items-center p-3 border-b border-gray-200 list-item';
+        console.log(`Rendering ${this.key} list with ${this.list.length} items`);
+        try {
+            if (!this.element) {
+                console.error('Render failed: element is not defined');
+                return;
+            }
             
-            const content = document.createElement('div');
-            content.className = 'flex-1';
+            this.element.innerHTML = '';
             
-            const titleDiv = document.createElement('div');
-            titleDiv.className = 'text-gray-900 font-medium';
-            titleDiv.textContent = item.title;
+            if (this.list.length === 0) {
+                const emptyMessage = document.createElement('div');
+                emptyMessage.className = 'text-center py-4 text-gray-500';
+                emptyMessage.textContent = 'アイテムがありません';
+                this.element.appendChild(emptyMessage);
+                return;
+            }
             
-            const detailsDiv = document.createElement('div');
-            detailsDiv.className = 'text-gray-600 text-sm mt-1';
-            detailsDiv.textContent = item.details || '詳細なし';
-            
-            const timestampDiv = document.createElement('div');
-            timestampDiv.className = 'text-xs text-gray-400 mt-1';
-            timestampDiv.textContent = item.timestamp;
-            
-            content.appendChild(titleDiv);
-            if (item.details) content.appendChild(detailsDiv);
-            content.appendChild(timestampDiv);
+            this.list.forEach((item, index) => {
+                try {
+                    const li = document.createElement('li');
+                    li.className = 'flex justify-between items-start p-3 border-b border-gray-200 list-item';
+                    li.dataset.itemId = item.id;
+                    
+                    const content = document.createElement('div');
+                    content.className = 'flex-1';
+                    
+                    const titleDiv = document.createElement('div');
+                    titleDiv.className = 'text-gray-900 font-medium';
+                    titleDiv.textContent = item.title || 'タイトルなし';
+                    
+                    content.appendChild(titleDiv);
+                    
+                    if (item.details) {
+                        const detailsDiv = document.createElement('div');
+                        detailsDiv.className = 'text-gray-600 text-sm mt-1';
+                        detailsDiv.textContent = item.details;
+                        content.appendChild(detailsDiv);
+                    }
+                    
+                    const timestampDiv = document.createElement('div');
+                    timestampDiv.className = 'text-xs text-gray-400 mt-1';
+                    timestampDiv.textContent = item.timestamp || new Date().toLocaleString();
+                    content.appendChild(timestampDiv);
 
-            const actions = document.createElement('div');
-            actions.className = 'flex space-x-2';
+                    const actions = document.createElement('div');
+                    actions.className = 'flex space-x-2';
 
-            const deleteBtn = document.createElement('button');
-            deleteBtn.className = 'text-red-500 hover:text-red-700';
-            deleteBtn.innerHTML = '削除';
-            deleteBtn.onclick = () => this.removeItem(item.id);
-            actions.appendChild(deleteBtn);
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'text-red-500 hover:text-red-700 text-sm';
+                    deleteBtn.innerHTML = '削除';
+                    deleteBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        this.removeItem(item.id);
+                    };
+                    actions.appendChild(deleteBtn);
 
-            li.appendChild(content);
-            li.appendChild(actions);
-            this.element.appendChild(li);
-        });
+                    li.appendChild(content);
+                    li.appendChild(actions);
+                    this.element.appendChild(li);
+                    
+                } catch (error) {
+                    console.error(`Error rendering item ${index}:`, error);
+                }
+            });
+            
+            console.log(`Rendered ${this.list.length} items in ${this.key}`);
+            
+        } catch (error) {
+            console.error('Error in render:', error);
+            if (this.element) {
+                this.element.innerHTML = `<div class="text-red-500 p-4">エラーが発生しました: ${error.message}</div>`;
+            }
+        }
     }
 }

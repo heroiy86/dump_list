@@ -2,6 +2,7 @@ export class TabManager {
     constructor() {
         this.activeTab = 'dump';
         this.setupEventListeners();
+        this.initializeTabs();
         this.loadInitialContent();
     }
 
@@ -55,41 +56,98 @@ export class TabManager {
     }
 
     async switchTab(tabId) {
-        // タブボタンの更新
-        document.querySelectorAll('.tab-button').forEach(button => {
-            button.classList.toggle('active', button.dataset.tab === tabId);
-        });
-
-        document.querySelectorAll('.bottom-tab-button').forEach(button => {
-            button.classList.toggle('active', button.dataset.tab === tabId);
-        });
-
-        // コンテンツの切り替え
-        const currentContent = document.querySelector(`#${this.activeTab}Content`);
-        const newContent = document.querySelector(`#${tabId}Content`);
-
-        // 現在のコンテンツをフェードアウト
-        currentContent.style.opacity = '0';
-        await new Promise(resolve => setTimeout(resolve, 300));
-        currentContent.classList.add('hidden');
-
-        // 新しいコンテンツを表示
-        newContent.classList.remove('hidden');
-        newContent.style.opacity = '0';
-        newContent.style.display = 'block';
-        
-        // フェードインアニメーション
-        requestAnimationFrame(() => {
+        try {
+            this.showDebugInfo(`Switching to tab: ${tabId}`);
+            
+            // Update active tab
+            this.activeTab = tabId;
+            
+            // Update tab buttons
+            this.updateTabButtons();
+            
+            // Get tab elements
+            const currentContent = document.querySelector(`#${this.activeTab}Content`);
+            const newContent = document.querySelector(`#${tabId}Content`);
+            
+            if (!newContent) {
+                throw new Error(`Tab content not found for: ${tabId}`);
+            }
+            
+            // Hide current content with fade out
+            if (currentContent) {
+                currentContent.style.opacity = '0';
+                await new Promise(resolve => setTimeout(resolve, 150));
+                currentContent.style.display = 'none';
+            }
+            
+            // Show new content with fade in
+            newContent.style.display = 'block';
+            newContent.style.opacity = '0';
+            
+            // Force reflow
+            newContent.offsetHeight;
+            
+            // Fade in
             newContent.style.opacity = '1';
-        });
+            newContent.style.transition = 'opacity 150ms ease-in-out';
+            
+            this.showDebugInfo(`Switched to tab: ${tabId}`);
+            
+            // Update URL hash
+            window.location.hash = tabId;
+            
+        } catch (error) {
+            console.error('Error switching tabs:', error);
+            this.showDebugInfo(`Error: ${error.message}`);
+        }
+    }
 
-        this.activeTab = tabId;
+    initializeTabs() {
+        // Hide all tab contents first
+        document.querySelectorAll('.tab-content').forEach(tab => {
+            tab.style.display = 'none';
+        });
+        
+        // Show active tab
+        const activeTab = document.querySelector(`#${this.activeTab}Content`);
+        if (activeTab) {
+            activeTab.style.display = 'block';
+        }
+        
+        // Update tab buttons
+        this.updateTabButtons();
+    }
+
+    updateTabButtons() {
+        // Update main tab buttons
+        document.querySelectorAll('.tab-button, .bottom-tab-button').forEach(button => {
+            const isActive = button.dataset.tab === this.activeTab;
+            button.classList.toggle('bg-blue-100', isActive);
+            button.classList.toggle('text-blue-700', isActive);
+            button.classList.toggle('border-blue-500', isActive);
+        });
     }
 
     loadInitialContent() {
-        dumpList.render();
-        todoList.render();
-        completedList.render();
+        console.log('Loading initial content...');
+        try {
+            dumpList.render();
+            todoList.render();
+            completedList.render();
+            console.log('Initial content loaded');
+        } catch (error) {
+            console.error('Error loading initial content:', error);
+            this.showDebugInfo('Error loading content: ' + error.message);
+        }
+    }
+    
+    showDebugInfo(message) {
+        const debugInfo = document.getElementById('debugInfo');
+        if (debugInfo) {
+            debugInfo.innerHTML += `<p>${new Date().toLocaleTimeString()}: ${message}</p>`;
+            debugInfo.scrollTop = debugInfo.scrollHeight;
+        }
+        console.log(message);
     }
 
     setupTooltips() {
