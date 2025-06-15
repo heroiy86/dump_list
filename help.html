@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ヘルプ - タスク管理アプリ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .help-section {
+            transition: all 0.3s ease;
+        }
+        .help-section:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+    <div class="container mx-auto px-4 py-8 max-w-4xl">
+        <header class="text-center mb-12">
+            <h1 class="text-4xl font-bold text-indigo-600 mb-4">タスク管理アプリ ヘルプ</h1>
+            <p class="text-lg text-gray-600">シンプルで直感的なタスク管理アプリの使い方ガイド</p>
+        </header>
+
+        <div class="grid gap-8">
+            <!-- 基本操作セクション -->
+            <section class="help-section bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-semibold mb-4 text-indigo-700 flex items-center">
+                    <i class="fas fa-mobile-alt mr-2"></i>基本操作
+                </h2>
+                <div class="space-y-4">
+                    <div class="flex items-start">
+                        <div class="bg-indigo-100 p-2 rounded-full mr-4">
+                            <i class="fas fa-arrows-alt-h text-indigo-600"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-medium text-lg">タブの切り替え</h3>
+                            <p class="text-gray-600">画面上部の「Dump」「ToDo」「完了」タブをタップして、各リストを切り替えます。</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start">
+                        <div class="bg-indigo-100 p-2 rounded-full mr-4">
+                            <i class="fas fa-plus text-indigo-600"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-medium text-lg">アイテムの追加</h3>
+                            <p class="text-gray-600">各リストの入力フィールドにテキストを入力し、「追加」ボタンまたはEnterキーを押して追加します。</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 各リストの機能セクション -->
+            <section class="help-section bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-semibold mb-4 text-indigo-700">各リストの機能</h2>
+                
+                <div class="space-y-6">
+                    <!-- ダンプリスト -->
+                    <div class="border-l-4 border-blue-500 pl-4">
+                        <h3 class="font-bold text-lg text-blue-700">📥 ダンプリスト</h3>
+                        <p class="text-gray-600 mb-3">気になることをとりあえず書き出すためのリストです。</p>
+                        <ul class="space-y-2 text-sm text-gray-600">
+                            <li class="flex items-start">
+                                <i class="fas fa-arrow-right text-blue-500 mt-1 mr-2"></i>
+                                <span>後で整理するためのメモとして活用できます</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-arrow-right text-blue-500 mt-1 mr-2"></i>
+                                <span>ToDoリストに移動させたい場合は、アイテムをタップして「ToDoに移動」を選択</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- ToDoリスト -->
+                    <div class="border-l-4 border-green-500 pl-4">
+                        <h3 class="font-bold text-lg text-green-700">📝 ToDoリスト</h3>
+                        <p class="text-gray-600 mb-3">具体的なタスクを管理するリストです。</p>
+                        <ul class="space-y-2 text-sm text-gray-600">
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
+                                <span>タスクをタップして完了状態にできます</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-edit text-green-500 mt-1 mr-2"></i>
+                                <span>編集ボタンでタスク内容を編集できます</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-trash text-red-500 mt-1 mr-2"></i>
+                                <span>削除ボタンでタスクを削除できます</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- 完了リスト -->
+                    <div class="border-l-4 border-purple-500 pl-4">
+                        <h3 class="font-bold text-lg text-purple-700">✅ 完了リスト</h3>
+                        <p class="text-gray-600 mb-3">完了したタスクの一覧です。</p>
+                        <ul class="space-y-2 text-sm text-gray-600">
+                            <li class="flex items-start">
+                                <i class="fas fa-undo text-purple-500 mt-1 mr-2"></i>
+                                <span>タスクをタップして未完了に戻せます</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-trash text-red-500 mt-1 mr-2"></i>
+                                <span>「すべて削除」ボタンで完了したタスクを一括削除できます</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- データ管理セクション -->
+            <section class="help-section bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-semibold mb-4 text-indigo-700">データ管理</h2>
+                <div class="space-y-4">
+                    <div class="flex items-start">
+                        <div class="bg-indigo-100 p-2 rounded-full mr-4">
+                            <i class="fas fa-save text-indigo-600"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-medium text-lg">自動保存</h3>
+                            <p class="text-gray-600">すべての変更は自動的にブラウザのローカルストレージに保存されます。ページを更新したり、ブラウザを閉じたりしてもデータは保持されます。</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start">
+                        <div class="bg-indigo-100 p-2 rounded-full mr-4">
+                            <i class="fas fa-download text-indigo-600"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-medium text-lg">データのエクスポート</h3>
+                            <p class="text-gray-600">各リストの「エクスポート」ボタンから、リストの内容をMarkdown形式でエクスポートできます。</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ヒントとコツ -->
+            <section class="help-section bg-yellow-50 p-6 rounded-lg border-l-4 border-yellow-400">
+                <h2 class="text-2xl font-semibold mb-4 text-yellow-700">💡 ヒントとコツ</h2>
+                <ul class="space-y-3">
+                    <li class="flex items-start">
+                        <i class="fas fa-lightbulb text-yellow-500 mt-1 mr-2"></i>
+                        <div>
+                            <span class="font-medium">素早い入力</span>
+                            <p class="text-gray-600">入力フィールドでEnterキーを押すと、素早くアイテムを追加できます。</p>
+                        </div>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-lightbulb text-yellow-500 mt-1 mr-2"></i>
+                        <div>
+                            <span class="font-medium">モバイル対応</span>
+                            <p class="text-gray-600">スマートフォンやタブレットでも快適にご利用いただけます。</p>
+                        </div>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-lightbulb text-yellow-500 mt-1 mr-2"></i>
+                        <div>
+                            <span class="font-medium">データのバックアップ</span>
+                            <p class="text-gray-600">定期的にデータをエクスポートして、バックアップを取ることをおすすめします。</p>
+                        </div>
+                    </li>
+                </ul>
+            </section>
+        </div>
+
+        <footer class="mt-12 text-center text-gray-500 text-sm">
+            <p>© 2025 タスク管理アプリ</p>
+            <p class="mt-2">
+                <a href="index.html" class="text-indigo-600 hover:underline">アプリに戻る</a>
+            </p>
+        </footer>
+    </div>
+</body>
+</html>
