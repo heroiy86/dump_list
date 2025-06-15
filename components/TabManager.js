@@ -32,12 +32,27 @@ export class TabManager {
         // Create tab buttons
         this.tabs.forEach(tab => {
             const button = document.createElement('button');
-            button.className = `flex-1 py-3 px-2 text-sm font-medium rounded-t-lg transition-colors duration-200 ${
-                this.activeTab === tab.id 
-                    ? 'text-blue-600 border-b-2 border-blue-500' 
-                    : 'text-gray-500 hover:text-blue-500'
-            }`;
-            button.innerHTML = `<i class="fas fa-${tab.icon} mr-1"></i>${tab.label}`;
+            // Create a container for the button content
+            const buttonContent = document.createElement('div');
+            buttonContent.className = 'relative inline-block pb-2';
+            
+            // Add icon and label
+            buttonContent.innerHTML = `
+                <i class="fas fa-${tab.icon} mr-1"></i>${tab.label}
+                <span class="absolute bottom-0 left-0 w-full h-0.5 bg-blue-500 transition-transform duration-300 transform scale-x-0 ${
+                    this.activeTab === tab.id ? 'scale-x-100' : ''
+                }"></span>
+            `;
+            
+            // Set button styles
+            button.className = `flex-1 py-3 px-2 text-sm font-medium text-gray-500 hover:text-blue-500 transition-colors duration-200`;
+            if (this.activeTab === tab.id) {
+                button.classList.add('text-blue-600');
+            }
+            
+            // Append the button content
+            button.innerHTML = '';
+            button.appendChild(buttonContent);
             button.dataset.tab = tab.id;
             button.onclick = () => this.switchTab(tab.id);
             tabContainer.appendChild(button);
@@ -57,31 +72,46 @@ export class TabManager {
         // Update tab buttons
         document.querySelectorAll('#tabContainer button').forEach(button => {
             const isActive = button.dataset.tab === tabId;
-            button.classList.toggle('bg-white', isActive);
+            const underline = button.querySelector('span');
+            
+            // Update text color
             button.classList.toggle('text-blue-600', isActive);
-            button.classList.toggle('border-t', isActive);
-            button.classList.toggle('border-l', isActive);
-            button.classList.toggle('border-r', isActive);
-            button.classList.toggle('border-gray-200', isActive);
             button.classList.toggle('text-gray-500', !isActive);
-            button.classList.toggle('hover:text-gray-700', !isActive);
-            button.classList.toggle('hover:bg-gray-100', !isActive);
+            button.classList.toggle('hover:text-blue-500', !isActive);
+            
+            // Update underline animation
+            if (underline) {
+                if (isActive) {
+                    underline.classList.remove('scale-x-0');
+                    underline.classList.add('scale-x-100');
+                } else {
+                    underline.classList.remove('scale-x-100');
+                    underline.classList.add('scale-x-0');
+                }
+            }
         });
-
-        // Show/hide tab content
+        
+        // Show the corresponding content with a smooth transition
         document.querySelectorAll('.tab-content').forEach(content => {
-            const shouldShow = content.id === `${tabId}Content`;
-            content.style.display = shouldShow ? 'block' : 'none';
+            content.style.display = 'none';
+            content.classList.remove('opacity-100');
         });
-
-        // Focus the input field of the active tab
-        const activeInput = document.getElementById(`${tabId}Input`);
-        if (activeInput) {
+        
+        const activeContent = document.getElementById(`${tabId}Content`);
+        if (activeContent) {
+            activeContent.style.display = 'block';
+            // Add a small delay to allow display:block to take effect before starting the opacity transition
             setTimeout(() => {
-                activeInput.focus();
-                // Ensure the tab is scrolled into view on mobile
-                activeInput.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            }, 0);
+                activeContent.classList.add('opacity-100');
+            }, 10);
+        }
+        
+        // Focus the input field if it exists
+        const inputField = document.getElementById(`${tabId}Input`);
+        if (inputField) {
+            inputField.focus();
+            // Ensure the tab is scrolled into view on mobile
+            inputField.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
     }
 }

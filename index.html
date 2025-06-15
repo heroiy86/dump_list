@@ -18,6 +18,16 @@
             animation: fadeIn 0.3s ease-out forwards;
         }
         
+        /* Tab content transitions */
+        .tab-content {
+            transition: opacity 0.3s ease-in-out;
+            opacity: 0;
+        }
+        
+        .tab-content.opacity-100 {
+            opacity: 1;
+        }
+        
         /* Custom scrollbar */
         ::-webkit-scrollbar {
             width: 6px;
