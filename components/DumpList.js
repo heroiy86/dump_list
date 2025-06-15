@@ -1,10 +1,12 @@
 import { ListManager } from './ListManager.js';
 import { TodoList } from './TodoList.js';
+import { StorageManager } from '../utils/StorageManager.js';
 
 export class DumpList extends ListManager {
     constructor() {
         super('dump');
         this.editingId = null;
+        this.list = StorageManager.loadData('dump') || [];
     }
 
     addItem(text) {
@@ -16,7 +18,7 @@ export class DumpList extends ListManager {
         };
         
         this.list.push(item);
-        this.save();
+        StorageManager.saveData('dump', this.list);
         this.render();
         return item;
     }
@@ -24,9 +26,12 @@ export class DumpList extends ListManager {
     moveToTodo(id) {
         const item = this.list.find(item => item.id === id);
         if (item) {
-            this.removeItem(id);
+            this.list = this.list.filter(i => i.id !== id);
+            StorageManager.saveData('dump', this.list);
+            
             const todoList = new TodoList();
             todoList.addItem(item.text);
+            
             this.render();
         }
     }
@@ -136,10 +141,16 @@ export class DumpList extends ListManager {
         const item = this.list.find(item => item.id === id);
         if (item) {
             item.text = newText;
-            this.save();
+            StorageManager.saveData('dump', this.list);
             this.render();
             return true;
         }
         return false;
+    }
+    
+    removeItem(id) {
+        this.list = this.list.filter(item => item.id !== id);
+        StorageManager.saveData('dump', this.list);
+        this.render();
     }
 }
