@@ -1,24 +1,54 @@
 import { ListManager } from './ListManager.js';
-import { StorageManager } from '../utils/StorageManager.js';
 
 export class CompletedList extends ListManager {
     constructor() {
         super('completed');
     }
 
-    addItem(title, details = '', originalPriority = 'medium') {
+    addItem(text) {
         const item = {
             id: Date.now(),
-            title: title,
-            details: details,
-            originalPriority: originalPriority,
-            completedAt: new Date().toLocaleString()
+            text: text,
+            timestamp: new Date().toISOString(),
+            completed: true
         };
         
         this.list.push(item);
-        StorageManager.saveData('completed', this.list);
+        this.save();
         this.render();
         return item;
+    }
+
+    createItemElement(item) {
+        const li = document.createElement('li');
+        li.className = 'group relative p-3 border-b border-gray-200 hover:bg-gray-50';
+        li.dataset.id = item.id;
+
+        const content = document.createElement('div');
+        content.className = 'whitespace-pre-wrap break-words pr-10 text-gray-500 line-through';
+        content.textContent = item.text;
+        
+        const actions = document.createElement('div');
+        actions.className = 'absolute right-3 top-3 flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity';
+        
+        // Delete button
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'text-red-500 hover:text-red-700';
+        deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
+        deleteBtn.title = '削除';
+        deleteBtn.onclick = (e) => {
+            e.stopPropagation();
+            if (confirm('このアイテムを削除しますか？')) {
+                this.removeItem(item.id);
+            }
+        };
+
+        actions.appendChild(deleteBtn);
+        
+        li.appendChild(content);
+        li.appendChild(actions);
+        
+        return li;
     }
 
     moveToTodo(id) {
@@ -26,7 +56,7 @@ export class CompletedList extends ListManager {
         if (item) {
             this.removeItem(id);
             const todoList = new TodoList();
-            todoList.addItem(item.text, item.originalPriority);
+            todoList.addItem(item.text);
         }
     }
 

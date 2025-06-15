@@ -30,44 +30,37 @@ export class TabManager {
 
         // リスト追加ボタン
         document.getElementById('dumpAddButton')?.addEventListener('click', () => {
-            const titleInput = document.getElementById('dumpTitleInput');
-            const detailsInput = document.getElementById('dumpDetailsInput');
-            
-            if (titleInput?.value.trim()) {
-                this.dumpList.addItem(titleInput.value.trim(), detailsInput?.value.trim() || '');
-                titleInput.value = '';
-                if (detailsInput) detailsInput.value = '';
-                titleInput.focus();
+            const input = document.getElementById('dumpInput');
+            if (input?.value.trim()) {
+                this.dumpList.addItem(input.value.trim());
+                input.value = '';
+                input.style.height = 'auto';
+                input.focus();
                 this.renderActiveTabContent();
             }
         });
 
-        // エンターキーで追加（タイトル入力中）
-        document.getElementById('dumpTitleInput')?.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && e.target.value.trim()) {
+        // エンターキーで追加（Shift+Enterで改行）
+        document.getElementById('dumpInput')?.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
-                const detailsInput = document.getElementById('dumpDetailsInput');
-                this.dumpList.addItem(e.target.value.trim(), detailsInput?.value.trim() || '');
-                e.target.value = '';
-                if (detailsInput) detailsInput.value = '';
-                this.renderActiveTabContent();
-            }
-        });
-
-        // エンターキーで追加（詳細入力中）
-        document.getElementById('dumpDetailsInput')?.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && e.ctrlKey) {
-                e.preventDefault();
-                const titleInput = document.getElementById('dumpTitleInput');
-                if (titleInput?.value.trim()) {
-                    this.dumpList.addItem(titleInput.value.trim(), e.target.value.trim());
-                    titleInput.value = '';
+                if (e.target.value.trim()) {
+                    this.dumpList.addItem(e.target.value.trim());
                     e.target.value = '';
-                    titleInput.focus();
+                    e.target.style.height = 'auto';
                     this.renderActiveTabContent();
                 }
             }
         });
+
+        // テキストエリアの自動リサイズ
+        const dumpInput = document.getElementById('dumpInput');
+        if (dumpInput) {
+            dumpInput.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = Math.min(this.scrollHeight, 20 * 16) + 'px'; // 20行まで
+            });
+        }
     }
 
     async switchTab(tabId) {

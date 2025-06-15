@@ -60,24 +60,16 @@
 
         <!-- Main Content -->
         <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-            <!-- Debug Info (can be removed later) -->
-            <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4" role="alert" id="debugInfo">
-                <p>Debug information will appear here</p>
-            </div>
             <div id="dumpContent" class="tab-content mobile-content">
                 <div class="bg-white shadow rounded-lg mobile-tab-content">
-                    <div class="space-y-3 mb-4">
-                        <div>
-                            <input type="text" id="dumpTitleInput" placeholder="タイトル" 
-                                   class="w-full border rounded-md p-2 mb-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                   required>
-                        </div>
+                    <div class="mb-4">
                         <div class="flex items-start space-x-2">
                             <div class="flex-1">
-                                <textarea id="dumpDetailsInput" placeholder="詳細（任意）" 
-                                          class="w-full border rounded-md p-2 h-20 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                                <textarea id="dumpInput" placeholder="新しいアイテムを入力..." 
+                                          class="w-full border rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                                          rows="2" style="min-height: 2.5rem; max-height: 20rem;"></textarea>
                             </div>
-                            <button id="dumpAddButton" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 flex-shrink-0">
+                            <button id="dumpAddButton" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 flex-shrink-0 self-end">
                                 追加
                             </button>
                         </div>
