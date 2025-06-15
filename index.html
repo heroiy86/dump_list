@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>リスト管理アプリ</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="styles/main.css">
+    <link href="styles/main.css" rel="stylesheet">
+    <link href="styles/transitions.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
 </head>
 <body class="bg-gray-100 min-h-screen">
     <div class="min-h-screen">
@@ -39,15 +41,20 @@
         </nav>
 
         <!-- Tab Navigation -->
-        <div class="bg-white shadow-sm">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="border-b border-gray-200">
-                    <nav class="-mb-px flex space-x-8" aria-label="Tabs">
-                        <button id="dumpTab" class="tab-button active" data-tab="dump">ダンプリスト</button>
-                        <button id="todoTab" class="tab-button" data-tab="todo">ToDoリスト</button>
-                        <button id="completedTab" class="tab-button" data-tab="completed">完了リスト</button>
-                    </nav>
-                </div>
+        <div class="flex border-b border-gray-200 mb-6 overflow-x-auto">
+            <div class="flex space-x-1">
+                <button class="tab-button py-3 px-6 font-medium text-sm rounded-t-lg transition-all duration-200 flex items-center" data-tab="dump">
+                    <i class="fas fa-inbox mr-2"></i>
+                    <span>Dump</span>
+                </button>
+                <button class="tab-button py-3 px-6 font-medium text-sm rounded-t-lg transition-all duration-200 flex items-center" data-tab="todo">
+                    <i class="fas fa-tasks mr-2"></i>
+                    <span>ToDo</span>
+                </button>
+                <button class="tab-button py-3 px-6 font-medium text-sm rounded-t-lg transition-all duration-200 flex items-center" data-tab="completed">
+                    <i class="fas fa-check-circle mr-2"></i>
+                    <span>完了</span>
+                </button>
             </div>
         </div>
 
@@ -57,7 +64,7 @@
             <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4" role="alert" id="debugInfo">
                 <p>Debug information will appear here</p>
             </div>
-            <div id="dumpContent" class="tab-content mobile-content" style="display: block;">
+            <div id="dumpContent" class="tab-content mobile-content">
                 <div class="bg-white shadow rounded-lg mobile-tab-content">
                     <div class="space-y-3 mb-4">
                         <div>

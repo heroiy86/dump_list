@@ -60,48 +60,50 @@ export class TabManager {
 
     async switchTab(tabId) {
         try {
+            if (this.isSwitching || this.activeTab === tabId) return;
+            this.isSwitching = true;
+            
             this.showDebugInfo(`Switching to tab: ${tabId}`);
             
             // Update active tab
+            const prevTab = this.activeTab;
             this.activeTab = tabId;
             
             // Update tab buttons
             this.updateTabButtons();
             
             // Get tab elements
-            const currentContent = document.querySelector(`#${this.activeTab}Content`);
+            const prevContent = document.querySelector(`#${prevTab}Content`);
             const newContent = document.querySelector(`#${tabId}Content`);
             
             if (!newContent) {
                 throw new Error(`Tab content not found for: ${tabId}`);
             }
             
-            // Hide current content with fade out
-            if (currentContent) {
-                currentContent.style.opacity = '0';
-                await new Promise(resolve => setTimeout(resolve, 150));
-                currentContent.style.display = 'none';
+            // Hide current content with slide out
+            if (prevContent) {
+                prevContent.classList.remove('active');
+                prevContent.style.pointerEvents = 'none';
             }
             
-            // Show new content with fade in
-            newContent.style.display = 'block';
-            newContent.style.opacity = '0';
+            // Show new content with slide in
+            newContent.classList.add('active');
+            newContent.style.pointerEvents = 'auto';
             
-            // Force reflow
-            newContent.offsetHeight;
+            // Update URL hash without page scroll
+            history.pushState(null, null, `#${tabId}`);
             
-            // Fade in
-            newContent.style.opacity = '1';
-            newContent.style.transition = 'opacity 150ms ease-in-out';
-            
+            // Force render the new content
             this.showDebugInfo(`Switched to tab: ${tabId}`);
             
-            // Update URL hash
-            window.location.hash = tabId;
+            // Trigger render for the active tab's list
+            this.renderActiveTabContent();
             
         } catch (error) {
             console.error('Error switching tabs:', error);
             this.showDebugInfo(`Error: ${error.message}`);
+        } finally {
+            this.isSwitching = false;
         }
     }
 
@@ -123,12 +125,27 @@ export class TabManager {
 
     updateTabButtons() {
         // Update main tab buttons
-        document.querySelectorAll('.tab-button, .bottom-tab-button').forEach(button => {
+        document.querySelectorAll('.tab-button').forEach(button => {
             const isActive = button.dataset.tab === this.activeTab;
-            button.classList.toggle('bg-blue-100', isActive);
-            button.classList.toggle('text-blue-700', isActive);
-            button.classList.toggle('border-blue-500', isActive);
+            button.classList.toggle('active', isActive);
+            button.classList.toggle('text-blue-600', isActive);
+            button.classList.toggle('bg-blue-50', isActive);
         });
+    }
+    
+    renderActiveTabContent() {
+        // Only render the active tab's content for better performance
+        switch(this.activeTab) {
+            case 'dump':
+                this.dumpList?.render();
+                break;
+            case 'todo':
+                this.todoList?.render();
+                break;
+            case 'completed':
+                this.completedList?.render();
+                break;
+        }
     }
 
     loadInitialContent() {
