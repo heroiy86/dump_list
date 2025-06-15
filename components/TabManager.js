@@ -21,38 +21,42 @@ export class TabManager {
         });
 
         // リスト追加ボタン
-        document.getElementById('dumpAddButton').addEventListener('click', () => {
+        document.getElementById('dumpAddButton')?.addEventListener('click', () => {
             const titleInput = document.getElementById('dumpTitleInput');
             const detailsInput = document.getElementById('dumpDetailsInput');
             
-            if (titleInput.value.trim()) {
-                dumpList.addItem(titleInput.value.trim(), detailsInput.value.trim());
+            if (titleInput?.value.trim()) {
+                this.dumpList.addItem(titleInput.value.trim(), detailsInput?.value.trim() || '');
                 titleInput.value = '';
-                detailsInput.value = '';
+                if (detailsInput) detailsInput.value = '';
                 titleInput.focus();
+                this.renderActiveTabContent();
             }
         });
 
         // エンターキーで追加（タイトル入力中）
-        document.getElementById('dumpTitleInput').addEventListener('keypress', (e) => {
+        document.getElementById('dumpTitleInput')?.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && e.target.value.trim()) {
+                e.preventDefault();
                 const detailsInput = document.getElementById('dumpDetailsInput');
-                dumpList.addItem(e.target.value.trim(), detailsInput.value.trim());
+                this.dumpList.addItem(e.target.value.trim(), detailsInput?.value.trim() || '');
                 e.target.value = '';
-                detailsInput.value = '';
+                if (detailsInput) detailsInput.value = '';
+                this.renderActiveTabContent();
             }
         });
 
         // エンターキーで追加（詳細入力中）
-        document.getElementById('dumpDetailsInput').addEventListener('keypress', (e) => {
+        document.getElementById('dumpDetailsInput')?.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && e.ctrlKey) {
                 e.preventDefault();
                 const titleInput = document.getElementById('dumpTitleInput');
-                if (titleInput.value.trim()) {
-                    dumpList.addItem(titleInput.value.trim(), e.target.value.trim());
+                if (titleInput?.value.trim()) {
+                    this.dumpList.addItem(titleInput.value.trim(), e.target.value.trim());
                     titleInput.value = '';
                     e.target.value = '';
                     titleInput.focus();
+                    this.renderActiveTabContent();
                 }
             }
         });
