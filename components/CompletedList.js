@@ -5,7 +5,11 @@ export class CompletedList extends ListManager {
     constructor(tabManager) {
         super('completed');
         this.tabManager = tabManager;
-        this.initializeEventListeners();
+    }
+    
+    initializeEventListeners() {
+        // No event listeners needed for CompletedList at the moment
+        // This method is kept for consistency with other list classes
     }
 
     renderItems(fragment) {
