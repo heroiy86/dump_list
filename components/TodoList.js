@@ -99,43 +99,29 @@ export class TodoList extends ListManager {
         textContainer.appendChild(priorityBadge);
         textContainer.appendChild(textSpan);
         
-        // Actions container
+        // Actions container - Always visible for mobile
         const actions = document.createElement('div');
-        actions.className = 'flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity';
+        actions.className = 'flex items-center space-x-1';
         
-        // Priority change button - More visible with better touch target
+        // Priority change button - Always visible with text
         const priorityButton = document.createElement('button');
-        priorityButton.className = 'text-white bg-purple-500 hover:bg-purple-600 p-2 rounded-full shadow-md transition-colors duration-200';
-        priorityButton.style.minWidth = '36px';
-        priorityButton.style.minHeight = '36px';
-        priorityButton.title = '優先度を変更';
-        priorityButton.setAttribute('aria-label', '優先度を変更');
-        priorityButton.innerHTML = '<i class="fas fa-flag"></i>';
+        priorityButton.className = 'text-xs bg-purple-500 text-white px-2 py-1 rounded shadow';
+        priorityButton.innerHTML = '<i class="fas fa-flag mr-1"></i>';
         priorityButton.onclick = (e) => this.changePriority(item.id, e);
         
-        // Edit button - More visible with better touch target
+        // Edit button - Always visible with text
         const editButton = document.createElement('button');
-        editButton.className = 'text-white bg-blue-500 hover:bg-blue-600 p-2 rounded-full shadow-md transition-colors duration-200';
-        editButton.style.minWidth = '36px';
-        editButton.style.minHeight = '36px';
-        editButton.title = '編集';
-        editButton.setAttribute('aria-label', '編集');
+        editButton.className = 'text-xs bg-blue-500 text-white px-2 py-1 rounded shadow';
         editButton.innerHTML = '<i class="fas fa-edit"></i>';
         editButton.onclick = (e) => this.startEditing(item.id, e);
         
-        // Delete button - More visible with better touch target
+        // Delete button - Always visible with text
         const deleteButton = document.createElement('button');
-        deleteButton.className = 'text-white bg-red-500 hover:bg-red-600 p-2 rounded-full shadow-md transition-colors duration-200';
-        deleteButton.style.minWidth = '36px';
-        deleteButton.style.minHeight = '36px';
-        deleteButton.title = '削除';
-        deleteButton.setAttribute('aria-label', '削除');
+        deleteButton.className = 'text-xs bg-red-500 text-white px-2 py-1 rounded shadow';
         deleteButton.innerHTML = '<i class="fas fa-trash"></i>';
         deleteButton.onclick = (e) => {
             e.stopPropagation();
-            if (window.confirm('このアイテムを削除しますか？')) {
-                this.removeItem(item.id);
-            }
+            this.removeItem(item.id);
         };
         
         // Add action buttons

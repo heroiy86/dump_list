@@ -77,33 +77,23 @@ export class DumpList extends ListManager {
             content.className = 'whitespace-pre-wrap break-words pr-14';
             content.textContent = item.text;
             
-            // Actions container - Always visible and better positioned
+            // Actions container - Always visible and better for mobile
             const actions = document.createElement('div');
-            actions.className = 'absolute right-3 top-3 flex space-x-2';
+            actions.className = 'absolute right-3 top-3 flex space-x-1';
             
-            // Edit button - More visible with better touch target
+            // Edit button - Always visible with text
             const editButton = document.createElement('button');
-            editButton.className = 'text-white bg-blue-500 hover:bg-blue-600 p-2 rounded-full shadow-md transition-colors duration-200';
-            editButton.style.minWidth = '36px';
-            editButton.style.minHeight = '36px';
-            editButton.innerHTML = '<i class="fas fa-edit"></i>';
-            editButton.title = '編集';
-            editButton.setAttribute('aria-label', '編集');
+            editButton.className = 'text-sm bg-blue-500 text-white px-2 py-1 rounded shadow';
+            editButton.innerHTML = '<i class="fas fa-edit mr-1"></i>編集';
             editButton.onclick = (e) => this.startEditing(item.id, e);
             
-            // Delete button - More visible with better touch target
+            // Delete button - Always visible with text
             const deleteButton = document.createElement('button');
-            deleteButton.className = 'text-white bg-red-500 hover:bg-red-600 p-2 rounded-full shadow-md transition-colors duration-200';
-            deleteButton.style.minWidth = '36px';
-            deleteButton.style.minHeight = '36px';
-            deleteButton.innerHTML = '<i class="fas fa-trash"></i>';
-            deleteButton.title = '削除';
-            deleteButton.setAttribute('aria-label', '削除');
+            deleteButton.className = 'text-sm bg-red-500 text-white px-2 py-1 rounded shadow';
+            deleteButton.innerHTML = '<i class="fas fa-trash mr-1"></i>削除';
             deleteButton.onclick = (e) => {
                 e.stopPropagation();
-                if (window.confirm('このアイテムを削除しますか？')) {
-                    this.removeItem(item.id);
-                }
+                this.removeItem(item.id);
             };
             
             // Move to Todo button

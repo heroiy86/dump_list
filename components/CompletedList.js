@@ -64,32 +64,26 @@ export class CompletedList extends ListManager {
                 <span>完了: ${formattedDate}</span>
             `;
             
-            // Actions container - Always visible and better styled
+            // Actions container - Always visible and better for mobile
             const actions = document.createElement('div');
-            actions.className = 'flex justify-end space-x-2 mt-3';
+            actions.className = 'flex justify-end space-x-2 mt-2';
             
-            // Move back to Todo button - More visible with better touch target
+            // Move back to Todo button - Always visible with icon
             const moveBackButton = document.createElement('button');
-            moveBackButton.className = 'flex items-center bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium px-3 py-2 rounded-lg shadow-md transition-colors duration-200';
-            moveBackButton.style.minHeight = '36px';
-            moveBackButton.innerHTML = '<i class="fas fa-arrow-left mr-2"></i>ToDoに戻す';
-            moveBackButton.setAttribute('aria-label', 'ToDoに戻す');
+            moveBackButton.className = 'bg-blue-500 text-white text-xs px-2 py-1 rounded shadow';
+            moveBackButton.innerHTML = '<i class="fas fa-arrow-left mr-1"></i>戻す';
             moveBackButton.onclick = (e) => {
                 e.stopPropagation();
                 this.moveBackToTodo(item.id);
             };
             
-            // Delete button - More visible with better touch target
+            // Delete button - Always visible with icon
             const deleteButton = document.createElement('button');
-            deleteButton.className = 'flex items-center bg-red-500 hover:bg-red-600 text-white text-sm font-medium px-3 py-2 rounded-lg shadow-md transition-colors duration-200';
-            deleteButton.style.minHeight = '36px';
-            deleteButton.innerHTML = '<i class="far fa-trash-alt mr-2"></i>削除';
-            deleteButton.setAttribute('aria-label', '削除');
+            deleteButton.className = 'bg-red-500 text-white text-xs px-2 py-1 rounded shadow';
+            deleteButton.innerHTML = '<i class="fas fa-trash"></i>';
             deleteButton.onclick = (e) => {
                 e.stopPropagation();
-                if (window.confirm('このアイテムを完全に削除しますか？')) {
-                    this.removeItem(item.id);
-                }
+                this.removeItem(item.id);
             };
             
             // Add action buttons
