@@ -58,8 +58,8 @@ export class TodoList extends ListManager {
         });
 
         sortedItems.forEach((item, index) => {
-            const li = this.createTodoItemElement(item, index);
-            fragment.appendChild(li);
+            const itemElement = this.createTodoItemElement(item, index);
+            fragment.appendChild(itemElement);
         });
     }
 
@@ -172,8 +172,8 @@ export class TodoList extends ListManager {
         container.appendChild(leftSection);
         container.appendChild(actions);
         
-        li.appendChild(container);
-        return li;
+        itemElement.appendChild(container);
+        return itemElement;
     }
 
     async toggleComplete(id) {
@@ -181,22 +181,20 @@ export class TodoList extends ListManager {
         if (!item) return;
         
         try {
-            if (item.completed) {
-                await this.updateItem(id, { completed: false });
-            } else {
-                const completedList = new CompletedList();
-                await this.moveItem(id, completedList, (item) => ({
-                    text: item.text,
-                    completedAt: new Date().toISOString(),
-                    originalPriority: item.priority || 'medium',
-                    timestamp: item.timestamp || new Date().toISOString()
-                }));
-                this.showMessage('完了しました！', 'green');
-                
-                // Switch to completed tab
-                if (this.tabManager) {
-                    this.tabManager.switchTab('completed');
-                }
+            const completedList = new CompletedList();
+            await this.moveItem(id, completedList, (item) => ({
+                text: item.text,
+                completedAt: new Date().toISOString(),
+                originalPriority: item.priority || 'medium',
+                timestamp: item.timestamp || new Date().toISOString(),
+                priority: item.priority || 'medium',
+                completed: true
+            }));
+            this.showMessage('完了しました！', 'green');
+            
+            // Switch to completed tab
+            if (this.tabManager) {
+                this.tabManager.switchTab('completed');
             }
         } catch (error) {
             console.error('Error toggling complete status:', error);
@@ -247,33 +245,29 @@ export class TodoList extends ListManager {
         const item = this.findItem(id);
         if (!item) return;
         
-        const li = document.querySelector(`li[data-id="${id}"]`);
-        if (!li) return;
+        const itemElement = document.querySelector(`[data-id="${id}"]`);
+        if (!itemElement) return;
         
-        // Save current content
-        const currentContent = li.innerHTML;
+        // Save current content for cancel
+        const currentContent = itemElement.innerHTML;
         
-        // Create edit form
+        // Create form for editing
         const form = document.createElement('form');
-        form.className = 'w-full';
         form.onsubmit = async (e) => {
             e.preventDefault();
             const newText = textarea.value.trim();
             if (newText) {
                 await this.updateItem(id, { text: newText });
+                itemElement.innerHTML = currentContent;
+                this.initializeEventListeners();
             }
-            li.innerHTML = currentContent;
-            this.initializeEventListeners();
         };
         
-        const container = document.createElement('div');
-        container.className = 'flex items-start space-x-2';
-        
+        // Create textarea
         const textarea = document.createElement('textarea');
         textarea.className = 'flex-1 border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500';
         textarea.value = item.text;
         textarea.rows = Math.max(2, item.text.split('\n').length);
-        textarea.style.minHeight = '2.5rem';
         
         // Auto-resize textarea
         const resizeTextarea = () => {
@@ -284,35 +278,35 @@ export class TodoList extends ListManager {
         textarea.addEventListener('input', resizeTextarea);
         setTimeout(resizeTextarea, 0);
         
-        // Save button
-        const saveButton = document.createElement('button');
-        saveButton.type = 'submit';
-        saveButton.className = 'bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded';
-        saveButton.textContent = '保存';
+        // Create buttons container
+        const buttons = document.createElement('div');
+        buttons.className = 'flex justify-end space-x-2 mt-2';
         
         // Cancel button
         const cancelButton = document.createElement('button');
         cancelButton.type = 'button';
-        cancelButton.className = 'bg-gray-200 hover:bg-gray-300 text-gray-800 px-3 py-1 rounded';
+        cancelButton.className = 'px-3 py-1 text-sm text-gray-600 hover:bg-gray-100 rounded';
         cancelButton.textContent = 'キャンセル';
         cancelButton.onclick = () => {
-            li.innerHTML = currentContent;
+            itemElement.innerHTML = currentContent;
             this.initializeEventListeners();
         };
         
+        // Save button
+        const saveButton = document.createElement('button');
+        saveButton.type = 'submit';
+        saveButton.className = 'px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600';
+        saveButton.textContent = '保存';
+        
         // Assemble the form
-        const buttonContainer = document.createElement('div');
-        buttonContainer.className = 'flex space-x-2 mt-2';
-        buttonContainer.appendChild(saveButton);
-        buttonContainer.appendChild(cancelButton);
+        buttons.appendChild(cancelButton);
+        buttons.appendChild(saveButton);
         
-        container.appendChild(textarea);
-        form.appendChild(container);
-        form.appendChild(buttonContainer);
+        form.appendChild(textarea);
+        form.appendChild(buttons);
         
-        // Replace content with form
-        li.innerHTML = '';
-        li.appendChild(form);
+        itemElement.innerHTML = '';
+        itemElement.appendChild(form);
         textarea.focus();
     }
 }

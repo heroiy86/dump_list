@@ -1,52 +1,67 @@
+import { StorageManager } from '../utils/StorageManager.js';
 import { DumpList } from '../components/DumpList.js';
 import { TodoList } from '../components/TodoList.js';
 import { CompletedList } from '../components/CompletedList.js';
 import { TabManager } from '../components/TabManager.js';
 
-// Initialize when DOM is fully loaded
-document.addEventListener('DOMContentLoaded', () => {
+// グローバル変数
+let dumpList, todoList, completedList, tabManager;
+
+// アプリケーションの初期化
+function initApp() {
     try {
-        // Initialize tab manager
-        const tabManager = new TabManager();
+        console.log('Initializing application...');
         
-        // Initialize list managers with tab manager
-        const dumpList = new DumpList();
-        const todoList = new TodoList(tabManager);
-        const completedList = new CompletedList(tabManager);
+        // Clean up previous instance if exists
+        if (tabManager && typeof tabManager.dispose === 'function') {
+            console.log('Cleaning up previous instance...');
+            tabManager.dispose();
+        }
         
-        // Initial render of all lists
-        dumpList.render();
-        todoList.render();
-        completedList.render();
+        // インスタンスの初期化
+        tabManager = new TabManager();
+        dumpList = new DumpList(tabManager);
+        todoList = new TodoList(tabManager);
+        completedList = new CompletedList(tabManager);
         
-        // Auto-resize textareas
-        document.querySelectorAll('textarea').forEach(textarea => {
-            const resizeTextarea = () => {
-                textarea.style.height = 'auto';
-                textarea.style.height = textarea.scrollHeight + 'px';
-            };
-            
-            textarea.addEventListener('input', resizeTextarea);
-            // Initial resize
-            resizeTextarea();
-        });
+        // Initialize tab manager with list instances
+        tabManager.initialize(dumpList, todoList, completedList);
+        
+        // デバッグ用にグローバルに公開
+        window.app = {
+            dumpList,
+            todoList,
+            completedList,
+            tabManager
+        };
         
         console.log('Application initialized successfully');
+        
+        // 初期レンダリングを実行
+        setTimeout(() => {
+            dumpList.render();
+            todoList.render();
+            completedList.render();
+        }, 100);
+        
     } catch (error) {
         console.error('Failed to initialize application:', error);
-        alert('アプリケーションの初期化中にエラーが発生しました。ページを再読み込みしてください。');
+        const debugInfo = document.getElementById('debugInfo');
+        if (debugInfo) {
+            debugInfo.innerHTML += `<p class="text-red-500">初期化エラー: ${error.message}</p>`;
+        }
     }
-});
+}
 
-// Add global error handler
-window.addEventListener('error', (event) => {
-    console.error('Unhandled error:', event.error);
-    alert(`エラーが発生しました: ${event.message}`);
-    return false;
-});
-
-// Handle unhandled promise rejections
-window.addEventListener('unhandledrejection', (event) => {
-    console.error('Unhandled promise rejection:', event.reason);
-    event.preventDefault();
+// DOMの読み込みが完了したら初期化
+document.addEventListener('DOMContentLoaded', () => {
+    initApp();
+    
+    // ハッシュに基づいてタブを切り替え
+    if (window.location.hash) {
+        const tabId = window.location.hash.substring(1);
+        if (tabManager && tabManager.switchTab) {
+            tabManager.switchTab(tabId);
+        }
+    }
 });

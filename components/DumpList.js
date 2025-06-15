@@ -3,9 +3,18 @@ import { TodoList } from './TodoList.js';
 import { TabManager } from './TabManager.js';
 
 export class DumpList extends ListManager {
-    constructor() {
+    constructor(tabManager) {
         super('dump');
+        this.tabManager = tabManager;
         this.initializeEventListeners();
+        
+        // Ensure the element is properly set
+        if (!this.element) {
+            this.element = document.getElementById('dumpList');
+        }
+        
+        // Initial render
+        this.render();
     }
 
     initializeEventListeners() {
@@ -28,16 +37,25 @@ export class DumpList extends ListManager {
     }
 
     async addNewItem() {
+        console.log('addNewItem called');
         const inputField = document.getElementById('dumpInput');
-        if (!inputField) return;
+        if (!inputField) {
+            console.error('Input field not found');
+            return;
+        }
+        console.log('Input field value:', inputField.value);
 
         const text = inputField.value.trim();
+        console.log('Trimmed text:', text);
+        
         if (text) {
             try {
-                await this.addItem({ 
+                console.log('Attempting to add new item:', text);
+                const result = await this.addItem({ 
                     text: text,
                     timestamp: new Date().toISOString()
                 });
+                console.log('Item added successfully:', result);
                 inputField.value = '';
                 // Reset textarea height
                 inputField.style.height = 'auto';
@@ -63,18 +81,31 @@ export class DumpList extends ListManager {
     }
 
     renderItems(fragment) {
+        if (!fragment) {
+            console.error('No fragment provided to renderItems');
+            return;
+        }
+        
+        // Create a list container
+        const listContainer = document.createElement('ul');
+        listContainer.className = 'space-y-2';
+        
         this.list.forEach((item, index) => {
-            const itemElement = document.createElement('div');
-            itemElement.className = 'list-item bg-white p-4 shadow-sm hover:shadow transition-shadow duration-200 mb-2';
+            const itemElement = document.createElement('li');
+            itemElement.className = 'bg-white p-4 shadow-sm hover:shadow transition-shadow duration-200 rounded';
             itemElement.dataset.id = item.id;
             
             // Add animation delay for staggered appearance
             itemElement.style.animationDelay = `${index * 50}ms`;
             itemElement.classList.add('animate-fade-in');
             
+            // Item content container
+            const contentContainer = document.createElement('div');
+            contentContainer.className = 'flex justify-between items-start';
+            
             // Item content
             const content = document.createElement('div');
-            content.className = 'whitespace-pre-wrap break-words pr-14';
+            content.className = 'whitespace-pre-wrap break-words flex-1';
             content.textContent = item.text;
             
             // Actions container - Always visible and better for mobile
@@ -114,12 +145,16 @@ export class DumpList extends ListManager {
             actions.appendChild(moveToTodoButton);
             
             // Assemble the item
-            itemElement.appendChild(content);
-            itemElement.appendChild(actions);
+            contentContainer.appendChild(content);
+            contentContainer.appendChild(actions);
+            itemElement.appendChild(contentContainer);
             
-            // Add to fragment
-            fragment.appendChild(itemElement);
+            // Add to list container
+            listContainer.appendChild(itemElement);
         });
+        
+        // Add the list container to the fragment
+        fragment.appendChild(listContainer);
     }
     
     startEditing(id, event) {
@@ -212,7 +247,6 @@ export class DumpList extends ListManager {
             }, 2000);
             
             // Switch to the todo tab
-            const tabManager = new TabManager();
             tabManager.switchTab('todo');
             
         } catch (error) {

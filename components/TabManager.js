@@ -1,5 +1,6 @@
 export class TabManager {
     constructor() {
+        this.lists = {}; // Will store list instances
         this.tabs = [
             { 
                 id: 'dump', 
@@ -23,6 +24,16 @@ export class TabManager {
         this.initializeTabs();
         // Ensure the active tab is shown
         this.switchTab(this.activeTab);
+    }
+    
+    // Initialize with list instances
+    initialize(dumpList, todoList, completedList) {
+        this.lists = {
+            dump: dumpList,
+            todo: todoList,
+            completed: completedList
+        };
+        return this;
     }
 
     initializeTabs() {
@@ -91,20 +102,34 @@ export class TabManager {
             }
         });
         
-        // Show the corresponding content with a smooth transition
+        // Show/hide tab contents with smooth transitions
         document.querySelectorAll('.tab-content').forEach(content => {
-            content.style.display = 'none';
-            content.classList.remove('opacity-100');
+            const isActive = content.id === `${tabId}Content`;
+            console.log(`Tab ${content.id}: isActive=${isActive}`);
+            
+            if (isActive) {
+                // Show the active tab content
+                console.log(`Showing tab ${content.id}`);
+                content.style.display = 'block';
+                // Force a reflow to ensure the transition works
+                void content.offsetWidth;
+                // Add the active class for the transition
+                content.classList.add('active');
+                console.log(`Classes after showing:`, content.className);
+            } else {
+                // Hide inactive tab contents
+                console.log(`Hiding tab ${content.id}`);
+                content.classList.remove('active');
+                console.log(`Classes before hiding:`, content.className);
+                // Wait for the transition to complete before hiding the element
+                setTimeout(() => {
+                    if (content.id !== `${tabId}Content` && !content.classList.contains('active')) {
+                        console.log(`Setting display:none for ${content.id}`);
+                        content.style.display = 'none';
+                    }
+                }, 300); // Match this with the CSS transition duration
+            }
         });
-        
-        const activeContent = document.getElementById(`${tabId}Content`);
-        if (activeContent) {
-            activeContent.style.display = 'block';
-            // Add a small delay to allow display:block to take effect before starting the opacity transition
-            setTimeout(() => {
-                activeContent.classList.add('opacity-100');
-            }, 10);
-        }
         
         // Focus the input field if it exists
         const inputField = document.getElementById(`${tabId}Input`);

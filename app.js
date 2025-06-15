@@ -19,10 +19,13 @@ function initApp() {
         }
         
         // インスタンスの初期化
-        dumpList = new DumpList();
-        todoList = new TodoList();
-        completedList = new CompletedList();
-        tabManager = new TabManager(dumpList, todoList, completedList);
+        tabManager = new TabManager();
+        dumpList = new DumpList(tabManager);
+        todoList = new TodoList(tabManager);
+        completedList = new CompletedList(tabManager);
+        
+        // Initialize tab manager with list instances
+        tabManager.initialize(dumpList, todoList, completedList);
         
         // デバッグ用にグローバルに公開
         window.app = {

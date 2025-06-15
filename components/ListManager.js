@@ -1,4 +1,4 @@
-import { StorageManager } from '../utils/StorageManager.js';
+import { StorageManager } from '../../utils/StorageManager.js';
 
 export class ListManager {
     constructor(key) {
@@ -22,15 +22,23 @@ export class ListManager {
     // Add an item to the list
     async addItem(itemData) {
         try {
+            console.log('Creating new item with data:', itemData);
             const item = {
                 id: Date.now(),
                 timestamp: new Date().toISOString(),
                 ...itemData
             };
+            console.log('Created item:', item);
             
             this.list.unshift(item); // Add to the beginning of the array
+            console.log('List after adding item:', this.list);
+            
             await this.save();
+            console.log('Item saved to storage');
+            
             this.render();
+            console.log('List re-rendered');
+            
             return item;
         } catch (error) {
             console.error('Error adding item:', error);
@@ -92,12 +100,21 @@ export class ListManager {
 
     // Render the list (to be implemented by child classes)
     render() {
-        if (!this.element) return;
+        console.log(`Rendering ${this.key} list`);
+        console.log('Element:', this.element);
+        console.log('List items:', this.list);
+        
+        if (!this.element) {
+            console.error('Cannot render: element is null');
+            return;
+        }
         
         // Clear the container
+        console.log('Clearing container');
         this.element.innerHTML = '';
         
         if (this.list.length === 0) {
+            console.log('List is empty, rendering empty state');
             this.renderEmptyState();
             return;
         }
@@ -121,6 +138,9 @@ export class ListManager {
             <i class="far fa-inbox text-3xl mb-2 opacity-50"></i>
             <p class="text-sm">アイテムがありません</p>
         `;
+        
+        // Clear the container and add the empty message
+        this.element.innerHTML = '';
         this.element.appendChild(emptyMessage);
     }
     

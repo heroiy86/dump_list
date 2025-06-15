@@ -8,68 +8,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        /* Custom animations */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fade-in {
-            animation: fadeIn 0.3s ease-out forwards;
-        }
-        
-        /* List styles */
-        ul, ol {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        
-        /* List item styles */
-        .list-item {
-            border-radius: 0.5rem;
-            margin-bottom: 0.5rem;
-            transition: background-color 0.2s ease, transform 0.1s ease;
-        }
-        
-        .list-item:hover {
-            background-color: #f9fafb;
-            transform: translateX(2px);
-        }
-        
-        /* Tab content transitions */
-        .tab-content {
-            transition: opacity 0.3s ease-in-out;
-            opacity: 0;
-        }
-        
-        .tab-content.opacity-100 {
-            opacity: 1;
-        }
-        
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 3px;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #c1c1c1;
-            border-radius: 3px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #a8a8a8;
-        }
-        
-        /* For Firefox */
-        * {
-            scrollbar-width: thin;
-            scrollbar-color: #c1c1c1 #f1f1f1;
-        }
-    </style>
+    <!-- External CSS Files -->
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/transitions.css">
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans">
     <div class="container mx-auto px-4 py-6 max-w-4xl">
@@ -87,7 +28,7 @@
             <!-- Tab Content -->
             <div class="p-4">
                 <!-- Dump List Tab -->
-                <div id="dumpContent" class="tab-content" style="display: block;">
+                <div id="dumpContent" class="tab-content active">
                     <div class="mb-4">
                         <div class="flex items-center space-x-2">
                             <textarea 
@@ -116,7 +57,7 @@
                 </div>
                 
                 <!-- Todo List Tab -->
-                <div id="todoContent" class="tab-content hidden">
+                <div id="todoContent" class="tab-content" style="display: none;">
                     <div class="mb-4">
                         <div class="flex items-center space-x-2">
                             <input 
@@ -139,7 +80,7 @@
                 </div>
                 
                 <!-- Completed List Tab -->
-                <div id="completedContent" class="tab-content hidden">
+                <div id="completedContent" class="tab-content" style="display: none;">
                     <div class="mb-4">
                         <div class="flex justify-between items-center">
                             <h3 class="text-lg font-medium text-gray-700">完了したタスク</h3>
@@ -159,7 +100,7 @@
         </div>
         
         <footer class="mt-8 text-center text-sm text-gray-500">
-            <p>© 2023 Task Manager. All rights reserved.</p>
+            <p>© 2025 Task Manager. All rights reserved.</p>
         </footer>
     </div>
 

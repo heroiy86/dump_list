@@ -101,9 +101,14 @@ export class CompletedList extends ListManager {
             content.appendChild(priorityBadge);
             content.appendChild(dateDiv);
             
-            li.appendChild(content);
-            li.appendChild(actions);
-            fragment.appendChild(li);
+            // Create container for content and actions
+            const container = document.createElement('div');
+            container.className = 'flex items-center justify-between';
+            container.appendChild(content);
+            container.appendChild(actions);
+            
+            itemElement.appendChild(container);
+            fragment.appendChild(itemElement);
         });
     }
     
