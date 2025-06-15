@@ -1,4 +1,5 @@
 import { ListManager } from './ListManager.js';
+import { TodoList } from './TodoList.js';
 
 export class DumpList extends ListManager {
     constructor() {
