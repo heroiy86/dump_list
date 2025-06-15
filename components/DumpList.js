@@ -65,7 +65,7 @@ export class DumpList extends ListManager {
     renderItems(fragment) {
         this.list.forEach((item, index) => {
             const li = document.createElement('li');
-            li.className = 'group relative p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors duration-200';
+            li.className = 'list-item bg-white p-4 shadow-sm hover:shadow transition-shadow duration-200';
             li.dataset.id = item.id;
             
             // Add animation delay for staggered appearance

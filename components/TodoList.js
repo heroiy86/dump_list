@@ -65,7 +65,7 @@ export class TodoList extends ListManager {
 
     createTodoItemElement(item, index) {
         const li = document.createElement('li');
-        li.className = 'group relative p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors duration-200';
+        li.className = 'list-item bg-white p-4 shadow-sm hover:shadow transition-shadow duration-200';
         li.dataset.id = item.id;
         li.style.animationDelay = `${index * 50}ms`;
         li.classList.add('animate-fade-in');
