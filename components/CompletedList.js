@@ -2,8 +2,10 @@ import { ListManager } from './ListManager.js';
 import { TodoList } from './TodoList.js';
 
 export class CompletedList extends ListManager {
-    constructor() {
+    constructor(tabManager) {
         super('completed');
+        this.tabManager = tabManager;
+        this.initializeEventListeners();
     }
 
     renderItems(fragment) {
@@ -101,15 +103,27 @@ export class CompletedList extends ListManager {
         });
     }
     
-    moveBackToTodo(id) {
+    async moveBackToTodo(id) {
         const item = this.findItem(id);
         if (!item) return;
         
-        const todoList = new TodoList();
-        this.moveItem(id, todoList, (item) => ({
-            text: item.text,
-            priority: item.originalPriority || 'medium',
-            completed: false
-        }));
+        try {
+            const todoList = new TodoList(this.tabManager);
+            await this.moveItem(id, todoList, (item) => ({
+                text: item.text,
+                priority: item.originalPriority || 'medium',
+                completed: false,
+                timestamp: item.timestamp || new Date().toISOString(),
+                originalPriority: item.originalPriority || 'medium'
+            }));
+            
+            // Switch to todo tab
+            if (this.tabManager) {
+                this.tabManager.switchTab('todo');
+            }
+        } catch (error) {
+            console.error('Error moving item back to todo:', error);
+            alert('ToDoに戻す際にエラーが発生しました: ' + error.message);
+        }
     }
 }

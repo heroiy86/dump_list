@@ -3,8 +3,9 @@ import { CompletedList } from './CompletedList.js';
 import { TabManager } from './TabManager.js';
 
 export class TodoList extends ListManager {
-    constructor() {
+    constructor(tabManager) {
         super('todo');
+        this.tabManager = tabManager;
         this.initializeEventListeners();
     }
 
@@ -163,8 +164,9 @@ export class TodoList extends ListManager {
                 this.showMessage('完了しました！', 'green');
                 
                 // Switch to completed tab
-                const tabManager = new TabManager();
-                tabManager.switchTab('completed');
+                if (this.tabManager) {
+                    this.tabManager.switchTab('completed');
+                }
             }
         } catch (error) {
             console.error('Error toggling complete status:', error);

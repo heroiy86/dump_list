@@ -9,10 +9,10 @@ document.addEventListener('DOMContentLoaded', () => {
         // Initialize tab manager
         const tabManager = new TabManager();
         
-        // Initialize list managers
+        // Initialize list managers with tab manager
         const dumpList = new DumpList();
-        const todoList = new TodoList();
-        const completedList = new CompletedList();
+        const todoList = new TodoList(tabManager);
+        const completedList = new CompletedList(tabManager);
         
         // Initial render of all lists
         dumpList.render();
