@@ -2,129 +2,190 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>リスト管理アプリ</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Manager</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="styles/main.css" rel="stylesheet">
-    <link href="styles/transitions.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Custom animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+        
+        /* For Firefox */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: #c1c1c1 #f1f1f1;
+        }
+    </style>
 </head>
-<body class="bg-gray-100 min-h-screen">
-    <div class="min-h-screen">
-        <!-- Navigation -->
-        <nav class="bg-white shadow-lg mobile-nav">
-            <div class="px-4 py-4">
-                <div class="flex justify-between items-center">
-                    <h1 class="text-xl font-bold text-gray-800">リスト管理アプリ</h1>
-                    <div class="flex items-center space-x-2">
-                        <div class="tooltip">
-                            <button id="exportButton" class="mobile-button bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors">
-                                <svg class="w-5 h-5 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
-                                </svg>
-                                エクスポート
+<body class="bg-gray-50 text-gray-800 font-sans">
+    <div class="container mx-auto px-4 py-6 max-w-4xl">
+        <header class="mb-8">
+            <h1 class="text-2xl font-bold text-gray-800 mb-2">Task Manager</h1>
+            <p class="text-gray-600">整理して、生産性を向上させましょう</p>
+        </header>
+        
+        <!-- Tabs -->
+        <div class="mb-6 bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+            <div id="tabContainer" class="flex border-b border-gray-200">
+                <!-- Tabs will be added here by JavaScript -->
+            </div>
+            
+            <!-- Tab Content -->
+            <div class="p-4">
+                <!-- Dump List Tab -->
+                <div id="dumpContent" class="tab-content" style="display: block;">
+                    <div class="mb-4">
+                        <div class="flex items-center space-x-2">
+                            <textarea 
+                                id="dumpInput" 
+                                class="flex-1 border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                                placeholder="気になることをとりあえず書き出しましょう..."
+                                rows="1"
+                                style="min-height: 2.5rem; max-height: 15rem; resize: none;"
+                                onkeydown="if(event.key === 'Enter' && !event.shiftKey) { 
+                                    event.preventDefault(); 
+                                    const btn = document.getElementById('dumpAddButton'); 
+                                    if(btn) btn.click(); 
+                                }"
+                            ></textarea>
+                            <button 
+                                id="dumpAddButton" 
+                                class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors duration-200"
+                            >
+                                <i class="fas fa-plus mr-1"></i>追加
                             </button>
-                            <span class="tooltiptext">全てのリストをエクスポートします</span>
-                        </div>
-                        <div class="tooltip">
-                            <button id="clearButton" class="mobile-button bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors">
-                                <svg class="w-5 h-5 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                </svg>
-                                クリア
-                            </button>
-                            <span class="tooltiptext">全てのリストを削除します</span>
                         </div>
                     </div>
+                    <div id="dumpList" class="bg-white rounded-lg overflow-hidden">
+                        <!-- Dump items will be added here -->
+                    </div>
                 </div>
-            </div>
-        </nav>
-
-        <!-- Tab Navigation -->
-        <div class="flex border-b border-gray-200 mb-6 overflow-x-auto">
-            <div class="flex space-x-1">
-                <button class="tab-button py-3 px-6 font-medium text-sm rounded-t-lg transition-all duration-200 flex items-center" data-tab="dump">
-                    <i class="fas fa-inbox mr-2"></i>
-                    <span>Dump</span>
-                </button>
-                <button class="tab-button py-3 px-6 font-medium text-sm rounded-t-lg transition-all duration-200 flex items-center" data-tab="todo">
-                    <i class="fas fa-tasks mr-2"></i>
-                    <span>ToDo</span>
-                </button>
-                <button class="tab-button py-3 px-6 font-medium text-sm rounded-t-lg transition-all duration-200 flex items-center" data-tab="completed">
-                    <i class="fas fa-check-circle mr-2"></i>
-                    <span>完了</span>
-                </button>
+                
+                <!-- Todo List Tab -->
+                <div id="todoContent" class="tab-content hidden">
+                    <div class="mb-4">
+                        <div class="flex items-center space-x-2">
+                            <input 
+                                type="text" 
+                                id="todoInput" 
+                                class="flex-1 border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                                placeholder="やることを入力..."
+                            >
+                            <button 
+                                id="todoAddButton" 
+                                class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors duration-200"
+                            >
+                                <i class="fas fa-plus mr-1"></i>追加
+                            </button>
+                        </div>
+                    </div>
+                    <div id="todoList" class="bg-white rounded-lg overflow-hidden">
+                        <!-- Todo items will be added here -->
+                    </div>
+                </div>
+                
+                <!-- Completed List Tab -->
+                <div id="completedContent" class="tab-content hidden">
+                    <div class="mb-4">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-lg font-medium text-gray-700">完了したタスク</h3>
+                            <button 
+                                id="clearCompletedBtn" 
+                                class="text-sm text-red-500 hover:text-red-700 flex items-center"
+                            >
+                                <i class="fas fa-trash-alt mr-1"></i> すべて削除
+                            </button>
+                        </div>
+                    </div>
+                    <div id="completedList" class="bg-white rounded-lg overflow-hidden">
+                        <!-- Completed items will be added here -->
+                    </div>
+                </div>
             </div>
         </div>
-
-        <!-- Main Content -->
-        <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-            <div id="dumpContent" class="tab-content mobile-content">
-                <div class="bg-white shadow rounded-lg mobile-tab-content">
-                    <div class="mb-4">
-                        <div class="flex items-start space-x-2">
-                            <div class="flex-1">
-                                <textarea id="dumpInput" placeholder="新しいアイテムを入力..." 
-                                          class="w-full border rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                                          rows="2" style="min-height: 2.5rem; max-height: 20rem;"></textarea>
-                            </div>
-                            <button id="dumpAddButton" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 flex-shrink-0 self-end">
-                                追加
-                            </button>
-                        </div>
-                    </div>
-                    <ul id="dumpList" class="space-y-3"></ul>
-                </div>
-            </div>
-
-            <div id="todoContent" class="tab-content hidden">
-                <h2 class="text-xl font-semibold mb-4">ToDoリスト</h2>
-                <div class="bg-white shadow rounded-lg p-6">
-                    <div class="flex justify-between items-center mb-4">
-                        <input type="text" id="todoInput" placeholder="新しいタスクを追加..." 
-                               class="flex-1 border rounded-md px-3 py-2 mr-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <button id="todoAddButton" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">追加</button>
-                    </div>
-                    <ul id="todoList" class="space-y-2"></ul>
-                </div>
-            </div>
-
-            <div id="completedContent" class="tab-content hidden">
-                <h2 class="text-xl font-semibold mb-4">完了リスト</h2>
-                <div class="bg-white shadow rounded-lg p-6">
-                    <ul id="completedList" class="space-y-2"></ul>
-                </div>
-            </div>
-        </main>
-
-        <!-- Bottom Navigation -->
-        <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-around py-3">
-                    <button id="dumpTabBottom" class="bottom-tab-button active" data-tab="dump">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-                        </svg>
-                        <span>ダンプ</span>
-                    </button>
-                    <button id="todoTabBottom" class="bottom-tab-button" data-tab="todo">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-                        </svg>
-                        <span>ToDo</span>
-                    </button>
-                    <button id="completedTabBottom" class="bottom-tab-button" data-tab="completed">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                        </svg>
-                        <span>完了</span>
-                    </button>
-                </div>
-            </div>
-        </nav>
+        
+        <footer class="mt-8 text-center text-sm text-gray-500">
+            <p>© 2023 Task Manager. All rights reserved.</p>
+        </footer>
     </div>
 
-    <script type="module" src="app.js"></script>
+    <!-- Initialize the app -->
+    <script type="module" src="./js/app.js"></script>
+    
+    <script>
+        // Set active tab from URL hash or default to dump
+        function setInitialTab() {
+            const hash = window.location.hash.substring(1) || 'dump';
+            const tab = document.querySelector(`button[data-tab="${hash}"]`);
+            if (tab) tab.click();
+        }
+
+        // Add clear all completed functionality
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set initial tab
+            setInitialTab();
+            
+            // Update URL hash when tab changes
+            document.querySelectorAll('[data-tab]').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    window.location.hash = tab.dataset.tab;
+                });
+            });
+            const clearCompletedBtn = document.getElementById('clearCompletedBtn');
+            if (clearCompletedBtn) {
+                clearCompletedBtn.addEventListener('click', () => {
+                    if (confirm('完了したタスクをすべて削除しますか？この操作は元に戻せません。')) {
+                        localStorage.removeItem('completedItems');
+                        const completedList = document.getElementById('completedList');
+                        if (completedList) {
+                            completedList.innerHTML = `
+                                <div class="text-center py-8 text-gray-400 animate-fade-in">
+                                    <i class="far fa-inbox text-3xl mb-2 opacity-50"></i>
+                                    <p class="text-sm">アイテムがありません</p>
+                                </div>
+                            `;
+                        }
+                    }
+                });
+            }
+            
+            // Auto-resize textareas
+            document.querySelectorAll('textarea').forEach(textarea => {
+                const resizeTextarea = () => {
+                    textarea.style.height = 'auto';
+                    textarea.style.height = textarea.scrollHeight + 'px';
+                };
+                
+                textarea.addEventListener('input', resizeTextarea);
+                // Initial resize
+                setTimeout(resizeTextarea, 0);
+            });
+        });
+    </script>
 </body>
 </html>

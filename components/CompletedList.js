@@ -1,110 +1,121 @@
 import { ListManager } from './ListManager.js';
+import { TodoList } from './TodoList.js';
 
 export class CompletedList extends ListManager {
     constructor() {
         super('completed');
     }
 
-    addItem(text) {
-        const item = {
-            id: Date.now(),
-            text: text,
-            timestamp: new Date().toISOString(),
-            completed: true
-        };
-        
-        this.list.push(item);
-        this.save();
-        this.render();
-        return item;
-    }
+    renderItems(fragment) {
+        // Sort by completion date (newest first)
+        const sortedItems = [...this.list].sort((a, b) => 
+            new Date(b.completedAt) - new Date(a.completedAt)
+        );
 
-    createItemElement(item) {
-        const li = document.createElement('li');
-        li.className = 'group relative p-3 border-b border-gray-200 hover:bg-gray-50';
-        li.dataset.id = item.id;
-
-        const content = document.createElement('div');
-        content.className = 'whitespace-pre-wrap break-words pr-10 text-gray-500 line-through';
-        content.textContent = item.text;
-        
-        const actions = document.createElement('div');
-        actions.className = 'absolute right-3 top-3 flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity';
-        
-        // Delete button
-        const deleteBtn = document.createElement('button');
-        deleteBtn.className = 'text-red-500 hover:text-red-700';
-        deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
-        deleteBtn.title = '削除';
-        deleteBtn.onclick = (e) => {
-            e.stopPropagation();
-            if (confirm('このアイテムを削除しますか？')) {
-                this.removeItem(item.id);
-            }
-        };
-
-        actions.appendChild(deleteBtn);
-        
-        li.appendChild(content);
-        li.appendChild(actions);
-        
-        return li;
-    }
-
-    moveToTodo(id) {
-        const item = this.list.find(item => item.id === id);
-        if (item) {
-            this.removeItem(id);
-            const todoList = new TodoList();
-            todoList.addItem(item.text);
-        }
-    }
-
-    render() {
-        this.element.innerHTML = '';
-        this.list.sort((a, b) => b.id - a.id).forEach(item => {
+        sortedItems.forEach((item, index) => {
             const li = document.createElement('li');
-            li.className = 'flex justify-between items-center p-3 border-b border-gray-200';
+            li.className = 'group relative p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors duration-200';
+            li.dataset.id = item.id;
+            li.style.animationDelay = `${index * 50}ms`;
+            li.classList.add('animate-fade-in');
             
+            // Item content
             const content = document.createElement('div');
-            content.className = 'flex-1';
-            const titleDiv = document.createElement('div');
-            titleDiv.className = 'text-gray-900 font-medium line-through';
-            titleDiv.textContent = item.title;
+            content.className = 'mb-2';
             
-            const detailsDiv = document.createElement('div');
-            detailsDiv.className = 'text-gray-600 text-sm mt-1 line-through';
-            detailsDiv.textContent = item.details || '';
+            // Completed text with strikethrough
+            const textDiv = document.createElement('div');
+            textDiv.className = 'text-gray-500 line-through';
+            textDiv.textContent = item.text;
             
-            const metaDiv = document.createElement('div');
-            metaDiv.className = 'text-sm text-gray-500 mt-2';
-            metaDiv.innerHTML = `
-                完了日: ${item.completedAt}<br>
-                優先度: ${item.originalPriority}
+            // Priority badge
+            const priorityBadge = document.createElement('span');
+            const priorityClasses = {
+                high: 'bg-red-100 text-red-800',
+                medium: 'bg-yellow-100 text-yellow-800',
+                low: 'bg-green-100 text-green-800'
+            };
+            const priorityLabels = {
+                high: '高',
+                medium: '中',
+                low: '低'
+            };
+            
+            priorityBadge.className = `text-xs font-medium px-2 py-0.5 rounded-full inline-block mt-2 ${
+                priorityClasses[item.originalPriority] || 'bg-gray-100 text-gray-800'
+            }`;
+            priorityBadge.textContent = priorityLabels[item.originalPriority] || item.originalPriority;
+            
+            // Completion date
+            const dateDiv = document.createElement('div');
+            dateDiv.className = 'text-xs text-gray-400 mt-1 flex items-center';
+            
+            const completionDate = item.completedAt ? new Date(item.completedAt) : new Date();
+            const formattedDate = completionDate.toLocaleDateString('ja-JP', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            
+            dateDiv.innerHTML = `
+                <i class="far fa-check-circle mr-1"></i>
+                <span>完了: ${formattedDate}</span>
             `;
             
-            content.appendChild(titleDiv);
-            if (item.details) content.appendChild(detailsDiv);
-            content.appendChild(metaDiv);
-
+            // Actions container - Always visible and better styled
             const actions = document.createElement('div');
-            actions.className = 'flex space-x-2';
-
-            const moveToTodoBtn = document.createElement('button');
-            moveToTodoBtn.className = 'text-blue-500 hover:text-blue-700';
-            moveToTodoBtn.innerHTML = 'ToDoに戻す';
-            moveToTodoBtn.onclick = () => this.moveToTodo(item.id);
-            actions.appendChild(moveToTodoBtn);
-
-            const deleteBtn = document.createElement('button');
-            deleteBtn.className = 'text-red-500 hover:text-red-700';
-            deleteBtn.innerHTML = '完全に削除';
-            deleteBtn.onclick = () => this.removeItem(item.id);
-            actions.appendChild(deleteBtn);
-
+            actions.className = 'flex justify-end space-x-2 mt-3';
+            
+            // Move back to Todo button - More visible with better touch target
+            const moveBackButton = document.createElement('button');
+            moveBackButton.className = 'flex items-center bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium px-3 py-2 rounded-lg shadow-md transition-colors duration-200';
+            moveBackButton.style.minHeight = '36px';
+            moveBackButton.innerHTML = '<i class="fas fa-arrow-left mr-2"></i>ToDoに戻す';
+            moveBackButton.setAttribute('aria-label', 'ToDoに戻す');
+            moveBackButton.onclick = (e) => {
+                e.stopPropagation();
+                this.moveBackToTodo(item.id);
+            };
+            
+            // Delete button - More visible with better touch target
+            const deleteButton = document.createElement('button');
+            deleteButton.className = 'flex items-center bg-red-500 hover:bg-red-600 text-white text-sm font-medium px-3 py-2 rounded-lg shadow-md transition-colors duration-200';
+            deleteButton.style.minHeight = '36px';
+            deleteButton.innerHTML = '<i class="far fa-trash-alt mr-2"></i>削除';
+            deleteButton.setAttribute('aria-label', '削除');
+            deleteButton.onclick = (e) => {
+                e.stopPropagation();
+                if (window.confirm('このアイテムを完全に削除しますか？')) {
+                    this.removeItem(item.id);
+                }
+            };
+            
+            // Add action buttons
+            actions.appendChild(moveBackButton);
+            actions.appendChild(deleteButton);
+            
+            // Assemble the item
+            content.appendChild(textDiv);
+            content.appendChild(priorityBadge);
+            content.appendChild(dateDiv);
+            
             li.appendChild(content);
             li.appendChild(actions);
-            this.element.appendChild(li);
+            fragment.appendChild(li);
         });
+    }
+    
+    moveBackToTodo(id) {
+        const item = this.findItem(id);
+        if (!item) return;
+        
+        const todoList = new TodoList();
+        this.moveItem(id, todoList, (item) => ({
+            text: item.text,
+            priority: item.originalPriority || 'medium',
+            completed: false
+        }));
     }
 }
