@@ -9,7 +9,7 @@ vendor/
 
 # Build output
 build/
-dist/
+# dist/  # Temporarily allowing dist directory for GitHub Pages deployment
 
 # IDE specific files
 .idea/

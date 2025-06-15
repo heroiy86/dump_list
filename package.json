@@ -3,7 +3,11 @@
   "version": "1.0.0",
   "description": "A simple task management application",
   "scripts": {
-    "build": "echo 'Build complete'"
+    "build": "node build.js",
+    "deploy": "npm run build && gh-pages -d dist"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "fs-extra": "^11.1.0",
+    "gh-pages": "^5.0.0"
+  }
 }

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Manager</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- External CSS Files -->
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/transitions.css">
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans">
+    <div class="container mx-auto px-4 py-6 max-w-4xl">
+        <header class="mb-8">
+            <h1 class="text-2xl font-bold text-gray-800 mb-2">Task Manager</h1>
+            <p class="text-gray-600">整理して、生産性を向上させましょう</p>
+        </header>
+        
+        <!-- Tabs -->
+        <div class="mb-6 bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+            <div id="tabContainer" class="flex border-b border-gray-200">
+                <!-- Tabs will be added here by JavaScript -->
+            </div>
+            
+            <!-- Tab Content -->
+            <div class="p-4">
+                <!-- Dump List Tab -->
+                <div id="dumpContent" class="tab-content active">
+                    <div class="mb-4">
+                        <div class="flex items-center space-x-2">
+                            <textarea 
+                                id="dumpInput" 
+                                class="flex-1 border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                                placeholder="気になることをとりあえず書き出しましょう..."
+                                rows="1"
+                                style="min-height: 2.5rem; max-height: 15rem; resize: none;"
+                                onkeydown="if(event.key === 'Enter' && !event.shiftKey) { 
+                                    event.preventDefault(); 
+                                    const btn = document.getElementById('dumpAddButton'); 
+                                    if(btn) btn.click(); 
+                                }"
+                            ></textarea>
+                            <button 
+                                id="dumpAddButton" 
+                                class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors duration-200"
+                            >
+                                <i class="fas fa-plus mr-1"></i>追加
+                            </button>
+                        </div>
+                    </div>
+                    <div id="dumpList" class="bg-white rounded-lg overflow-hidden">
+                        <!-- Dump items will be added here -->
+                    </div>
+                </div>
+                
+                <!-- Todo List Tab -->
+                <div id="todoContent" class="tab-content" style="display: none;">
+                    <div class="mb-4">
+                        <div class="flex items-center space-x-2">
+                            <input 
+                                type="text" 
+                                id="todoInput" 
+                                class="flex-1 border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                                placeholder="やることを入力..."
+                            >
+                            <button 
+                                id="todoAddButton" 
+                                class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors duration-200"
+                            >
+                                <i class="fas fa-plus mr-1"></i>追加
+                            </button>
+                        </div>
+                    </div>
+                    <div id="todoList" class="bg-white rounded-lg overflow-hidden">
+                        <!-- Todo items will be added here -->
+                    </div>
+                </div>
+                
+                <!-- Completed List Tab -->
+                <div id="completedContent" class="tab-content" style="display: none;">
+                    <div class="mb-4">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-lg font-medium text-gray-700">完了したタスク</h3>
+                            <button 
+                                id="clearCompletedBtn" 
+                                class="text-sm text-red-500 hover:text-red-700 flex items-center"
+                            >
+                                <i class="fas fa-trash-alt mr-1"></i> すべて削除
+                            </button>
+                        </div>
+                    </div>
+                    <div id="completedList" class="bg-white rounded-lg overflow-hidden">
+                        <!-- Completed items will be added here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer class="mt-8 text-center text-sm text-gray-500">
+            <p>© 2025 Task Manager. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <!-- Initialize the app -->
+    <script type="module" src="./app.js"></script>
+    
+    <script>
+        // Clear all completed functionality
+        document.addEventListener('DOMContentLoaded', () => {
+            const clearCompletedBtn = document.getElementById('clearCompletedBtn');
+            if (clearCompletedBtn) {
+                clearCompletedBtn.addEventListener('click', () => {
+                    if (confirm('完了したタスクをすべて削除しますか？この操作は元に戻せません。')) {
+                        localStorage.removeItem('completedItems');
+                        const completedList = document.getElementById('completedList');
+                        if (completedList) {
+                            completedList.innerHTML = `
+                                <div class="text-center py-8 text-gray-400 animate-fade-in">
+                                    <i class="far fa-inbox text-3xl mb-2 opacity-50"></i>
+                                    <p class="text-sm">アイテムがありません</p>
+                                </div>
+                            `;
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
