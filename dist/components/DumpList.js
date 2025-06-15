@@ -224,7 +224,7 @@ export class DumpList extends ListManager {
         if (!item) return;
         
         try {
-            const todoList = new TodoList();
+            const todoList = new TodoList(this.tabManager);
             // Move the item to the todo list
             await this.moveItem(id, todoList, (item) => ({
                 text: item.text,
@@ -247,7 +247,9 @@ export class DumpList extends ListManager {
             }, 2000);
             
             // Switch to the todo tab
-            tabManager.switchTab('todo');
+            if (this.tabManager) {
+                this.tabManager.switchTab('todo');
+            }
             
         } catch (error) {
             console.error('Error moving item to todo:', error);
