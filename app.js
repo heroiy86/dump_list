@@ -12,11 +12,17 @@ function initApp() {
     try {
         console.log('Initializing application...');
         
+        // Clean up previous instance if exists
+        if (tabManager && typeof tabManager.dispose === 'function') {
+            console.log('Cleaning up previous instance...');
+            tabManager.dispose();
+        }
+        
         // インスタンスの初期化
-        const dumpList = new DumpList();
-        const todoList = new TodoList();
-        const completedList = new CompletedList();
-        const tabManager = new TabManager(dumpList, todoList, completedList);
+        dumpList = new DumpList();
+        todoList = new TodoList();
+        completedList = new CompletedList();
+        tabManager = new TabManager(dumpList, todoList, completedList);
         
         // デバッグ用にグローバルに公開
         window.app = {

@@ -4,20 +4,28 @@ export class TabManager {
         this.todoList = todoList;
         this.completedList = completedList;
         this.activeTab = 'dump';
+        this.eventListeners = [];
         this.setupEventListeners();
         this.initializeTabs();
         this.loadInitialContent();
     }
 
     setupEventListeners() {
+        // Remove any existing event listeners
+        this.cleanupEventListeners();
+        
         // 上部タブ
         document.querySelectorAll('.tab-button').forEach(button => {
-            button.onclick = () => this.switchTab(button.dataset.tab);
+            const handler = () => this.switchTab(button.dataset.tab);
+            button.addEventListener('click', handler);
+            this.eventListeners.push({ element: button, type: 'click', handler });
         });
 
         // 下部タブ
         document.querySelectorAll('.bottom-tab-button').forEach(button => {
-            button.onclick = () => this.switchTab(button.dataset.tab);
+            const handler = () => this.switchTab(button.dataset.tab);
+            button.addEventListener('click', handler);
+            this.eventListeners.push({ element: button, type: 'click', handler });
         });
 
         // リスト追加ボタン
@@ -176,21 +184,42 @@ export class TabManager {
 
     setupTooltips() {
         document.querySelectorAll('.tooltip').forEach(tooltip => {
-            tooltip.addEventListener('mouseenter', (e) => {
+            const mouseEnterHandler = (e) => {
                 const tooltiptext = tooltip.querySelector('.tooltiptext');
                 if (tooltiptext) {
                     tooltiptext.style.visibility = 'visible';
                     tooltiptext.style.opacity = '1';
                 }
-            });
-
-            tooltip.addEventListener('mouseleave', (e) => {
+            };
+            
+            const mouseLeaveHandler = (e) => {
                 const tooltiptext = tooltip.querySelector('.tooltiptext');
                 if (tooltiptext) {
                     tooltiptext.style.visibility = 'hidden';
                     tooltiptext.style.opacity = '0';
                 }
-            });
+            };
+            
+            tooltip.addEventListener('mouseenter', mouseEnterHandler);
+            tooltip.addEventListener('mouseleave', mouseLeaveHandler);
+            
+            this.eventListeners.push(
+                { element: tooltip, type: 'mouseenter', handler: mouseEnterHandler },
+                { element: tooltip, type: 'mouseleave', handler: mouseLeaveHandler }
+            );
         });
+    }
+    
+    cleanupEventListeners() {
+        // Remove all registered event listeners
+        this.eventListeners.forEach(({ element, type, handler }) => {
+            element.removeEventListener(type, handler);
+        });
+        this.eventListeners = [];
+    }
+    
+    dispose() {
+        this.cleanupEventListeners();
+        // Clean up any other resources if needed
     }
 }
