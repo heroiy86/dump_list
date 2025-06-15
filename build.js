@@ -1,11 +1,11 @@
 const fs = require('fs-extra');
 const path = require('path');
 
-// コピー元とコピー先のディレクトリを定義
+// Define source and destination directories
 const srcDir = __dirname;
 const distDir = path.join(__dirname, 'dist');
 
-// コピーするファイルとディレクトリのリスト
+// List of files and directories to copy
 const filesToCopy = [
     'index.html',
     'styles',
@@ -13,42 +13,89 @@ const filesToCopy = [
     'utils'
 ];
 
-// dist ディレクトリが存在しない場合は作成
+// Create dist directory if it doesn't exist
 if (!fs.existsSync(distDir)) {
     fs.mkdirSync(distDir, { recursive: true });
 }
 
-// ファイルとディレクトリをコピーする関数
+// Function to copy files and directories
 async function copyFiles() {
     try {
-        // 各ファイル/ディレクトリをコピー
+        // Copy each file/directory
         for (const file of filesToCopy) {
             const srcPath = path.join(srcDir, file);
             const destPath = path.join(distDir, file);
             
             console.log(`Copying ${srcPath} to ${destPath}`);
-            await fs.copy(srcPath, destPath);
+            await fs.copy(srcPath, destPath, { overwrite: true });
         }
 
-        // app.js を dist ディレクトリのルートにコピー
-        await fs.copyFile(
-            path.join(srcDir, 'js', 'app.js'),
-            path.join(distDir, 'app.js')
-        );
-
-        // app.js の相対パスを修正
+        // Copy app.js to the root of dist directory
         const appJsPath = path.join(distDir, 'app.js');
-        let appJsContent = await fs.readFile(appJsPath, 'utf8');
         
-        // 相対パスを修正
-        appJsContent = appJsContent
-            .replace("from '../utils/StorageManager.js'", "from './utils/StorageManager.js'")
-            .replace("from '../components/DumpList.js'", "from './components/DumpList.js'")
-            .replace("from '../components/TodoList.js'", "from './components/TodoList.js'")
-            .replace("from '../components/CompletedList.js'", "from './components/CompletedList.js'")
-            .replace("from '../components/TabManager.js'", "from './components/TabManager.js'");
+        // Read the original app.js content
+        let appJsContent = `
+import { TabManager } from './components/TabManager.js';
+import { DumpList } from './components/DumpList.js';
+import { TodoList } from './components/TodoList.js';
+import { CompletedList } from './components/CompletedList.js';
+
+// Global variables
+let dumpList, todoList, completedList, tabManager;
+
+// Initialize the application
+function initApp() {
+    try {
+        console.log('Initializing application...');
         
-        await fs.writeFile(appJsPath, appJsContent, 'utf8');
+        // Initialize tab manager
+        tabManager = new TabManager(['dump', 'todo', 'completed']);
+        
+        // Initialize lists
+        dumpList = new DumpList(tabManager);
+        todoList = new TodoList(tabManager);
+        completedList = new CompletedList(tabManager);
+        
+        // Handle hash changes
+        window.addEventListener('hashchange', handleHashChange);
+        
+        // Initial render
+        handleHashChange();
+        
+        console.log('Application initialized successfully');
+    } catch (error) {
+        console.error('Error initializing application:', error);
+    }
+}
+
+// Handle hash changes
+function handleHashChange() {
+    const hash = window.location.hash.substring(1) || 'dump';
+    tabManager.switchTab(hash);
+    
+    // Focus the input field of the active tab
+    const activeInput = document.getElementById('${hash}Input');
+    if (activeInput) {
+        setTimeout(() => {
+            activeInput.focus();
+        }, 100);
+    }
+}
+
+// Initialize the app when the DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    initApp();
+    
+    // Debug
+    window.dumpList = dumpList;
+    window.todoList = todoList;
+    window.completedList = completedList;
+    window.tabManager = tabManager;
+});
+        `;
+        
+        // Write the app.js file
+        await fs.writeFile(appJsPath, appJsContent.trim(), 'utf8');
         
         console.log('Build completed successfully!');
     } catch (err) {
@@ -57,5 +104,5 @@ async function copyFiles() {
     }
 }
 
-// ビルドを実行
+// Run the build
 copyFiles();
