@@ -64,62 +64,85 @@ export class TodoList extends ListManager {
     }
 
     createTodoItemElement(item, index) {
-        const li = document.createElement('li');
-        li.className = 'list-item bg-white p-4 shadow-sm hover:shadow transition-shadow duration-200';
-        li.dataset.id = item.id;
-        li.style.animationDelay = `${index * 50}ms`;
-        li.classList.add('animate-fade-in');
+        const itemElement = document.createElement('div');
+        itemElement.className = 'list-item bg-white p-4 shadow-sm hover:shadow transition-shadow duration-200 mb-2';
+        itemElement.dataset.id = item.id;
+        itemElement.style.animationDelay = `${index * 50}ms`;
+        itemElement.classList.add('animate-fade-in');
+        
+        // Checkbox and content container
+        const contentContainer = document.createElement('div');
+        contentContainer.className = 'flex items-start';
         
         // Checkbox
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
-        checkbox.className = 'h-5 w-5 text-blue-600 rounded focus:ring-blue-500 mr-3';
-        checkbox.checked = item.completed;
-        checkbox.onchange = () => this.toggleComplete(item.id);
+        checkbox.className = 'form-checkbox h-5 w-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500 mt-1';
+        checkbox.checked = item.completed || false;
+        checkbox.onchange = (e) => this.toggleComplete(item.id, e);
+        
+        // Text and metadata container
+        const textContainer = document.createElement('div');
+        textContainer.className = 'ml-2 flex-1';
+        
+        // Task text
+        const textSpan = document.createElement('div');
+        textSpan.className = 'text-gray-800';
+        textSpan.textContent = item.text;
+        
+        // Metadata row (priority and due date)
+        const metaRow = document.createElement('div');
+        metaRow.className = 'mt-1 flex items-center flex-wrap gap-2';
         
         // Priority badge
         const priorityBadge = document.createElement('span');
-        const priorityClasses = {
-            high: 'bg-red-100 text-red-800',
-            medium: 'bg-yellow-100 text-yellow-800',
-            low: 'bg-green-100 text-green-800'
-        };
-        const priorityLabels = { high: '高', medium: '中', low: '低' };
+        priorityBadge.className = `text-xs px-2 py-0.5 rounded-full ${
+            item.priority === 'high' ? 'bg-red-100 text-red-800' :
+            item.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' :
+            'bg-green-100 text-green-800'
+        }`;
+        priorityBadge.textContent = {
+            high: '高',
+            medium: '中',
+            low: '低'
+        }[item.priority] || item.priority;
         
-        priorityBadge.className = `text-xs font-medium px-2 py-0.5 rounded-full mr-2 ${priorityClasses[item.priority] || 'bg-gray-100 text-gray-800'}`;
-        priorityBadge.textContent = priorityLabels[item.priority] || item.priority;
+        // Due date if exists
+        if (item.dueDate) {
+            const dueDate = new Date(item.dueDate);
+            const dueDateSpan = document.createElement('span');
+            dueDateSpan.className = 'text-xs text-gray-500 flex items-center';
+            dueDateSpan.innerHTML = `<i class="far fa-calendar-alt mr-1"></i>${dueDate.toLocaleDateString('ja-JP')}`;
+            metaRow.appendChild(dueDateSpan);
+        }
         
-        // Item text
-        const textSpan = document.createElement('span');
-        textSpan.className = item.completed ? 'line-through text-gray-400' : 'text-gray-800';
-        textSpan.textContent = item.text;
+        // Add priority badge to meta row
+        metaRow.insertBefore(priorityBadge, metaRow.firstChild);
         
-        // Text container
-        const textContainer = document.createElement('div');
-        textContainer.className = 'flex-1 flex items-center';
-        textContainer.appendChild(priorityBadge);
+        // Assemble text container
         textContainer.appendChild(textSpan);
+        textContainer.appendChild(metaRow);
         
-        // Actions container - Always visible for mobile
+        // Add checkbox and text container to content container
+        contentContainer.appendChild(checkbox);
+        contentContainer.appendChild(textContainer);
+        
+        // Action buttons container - Always visible
         const actions = document.createElement('div');
-        actions.className = 'flex items-center space-x-1';
+        actions.className = 'mt-2 flex justify-end space-x-2';
         
-        // Priority change button - Always visible with text
-        const priorityButton = document.createElement('button');
-        priorityButton.className = 'text-xs bg-purple-500 text-white px-2 py-1 rounded shadow';
-        priorityButton.innerHTML = '<i class="fas fa-flag mr-1"></i>';
-        priorityButton.onclick = (e) => this.changePriority(item.id, e);
-        
-        // Edit button - Always visible with text
+        // Edit button - Always visible with icon only
         const editButton = document.createElement('button');
         editButton.className = 'text-xs bg-blue-500 text-white px-2 py-1 rounded shadow';
         editButton.innerHTML = '<i class="fas fa-edit"></i>';
+        editButton.title = '編集';
         editButton.onclick = (e) => this.startEditing(item.id, e);
         
-        // Delete button - Always visible with text
+        // Delete button - Always visible with icon only
         const deleteButton = document.createElement('button');
         deleteButton.className = 'text-xs bg-red-500 text-white px-2 py-1 rounded shadow';
         deleteButton.innerHTML = '<i class="fas fa-trash"></i>';
+        deleteButton.title = '削除';
         deleteButton.onclick = (e) => {
             e.stopPropagation();
             this.removeItem(item.id);

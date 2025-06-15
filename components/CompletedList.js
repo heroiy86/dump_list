@@ -19,11 +19,11 @@ export class CompletedList extends ListManager {
         );
 
         sortedItems.forEach((item, index) => {
-            const li = document.createElement('li');
-            li.className = 'list-item bg-white p-4 shadow-sm hover:shadow transition-shadow duration-200';
-            li.dataset.id = item.id;
-            li.style.animationDelay = `${index * 50}ms`;
-            li.classList.add('animate-fade-in');
+            const itemElement = document.createElement('div');
+            itemElement.className = 'list-item bg-white p-4 shadow-sm hover:shadow transition-shadow duration-200 mb-2';
+            itemElement.dataset.id = item.id;
+            itemElement.style.animationDelay = `${index * 50}ms`;
+            itemElement.classList.add('animate-fade-in');
             
             // Item content
             const content = document.createElement('div');

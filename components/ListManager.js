@@ -92,28 +92,25 @@ export class ListManager {
 
     // Render the list (to be implemented by child classes)
     render() {
-        if (!this.element) {
-            console.error('Render failed: element is not defined');
-            return;
-        }
+        if (!this.element) return;
         
-        // Clear the current content
+        // Clear the container
         this.element.innerHTML = '';
         
         if (this.list.length === 0) {
             this.renderEmptyState();
-        } else {
-            // Create a document fragment for better performance
-            const fragment = document.createDocumentFragment();
-            
-            // Sort items by timestamp (newest first)
-            this.sortItems();
-            
-            // Let child classes implement the actual rendering
-            this.renderItems(fragment);
-            
-            this.element.appendChild(fragment);
+            return;
         }
+        
+        // Create a container for the list items
+        const listContainer = document.createElement('div');
+        listContainer.className = 'space-y-2';
+        
+        // Render items into the container
+        this.renderItems(listContainer);
+        
+        // Add the container to the element
+        this.element.appendChild(listContainer);
     }
     
     // Render empty state

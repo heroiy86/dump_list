@@ -64,13 +64,13 @@ export class DumpList extends ListManager {
 
     renderItems(fragment) {
         this.list.forEach((item, index) => {
-            const li = document.createElement('li');
-            li.className = 'list-item bg-white p-4 shadow-sm hover:shadow transition-shadow duration-200';
-            li.dataset.id = item.id;
+            const itemElement = document.createElement('div');
+            itemElement.className = 'list-item bg-white p-4 shadow-sm hover:shadow transition-shadow duration-200 mb-2';
+            itemElement.dataset.id = item.id;
             
             // Add animation delay for staggered appearance
-            li.style.animationDelay = `${index * 50}ms`;
-            li.classList.add('animate-fade-in');
+            itemElement.style.animationDelay = `${index * 50}ms`;
+            itemElement.classList.add('animate-fade-in');
             
             // Item content
             const content = document.createElement('div');
@@ -79,18 +79,20 @@ export class DumpList extends ListManager {
             
             // Actions container - Always visible and better for mobile
             const actions = document.createElement('div');
-            actions.className = 'absolute right-3 top-3 flex space-x-1';
+            actions.className = 'mt-2 flex justify-end space-x-2';
             
             // Edit button - Always visible with text
             const editButton = document.createElement('button');
-            editButton.className = 'text-sm bg-blue-500 text-white px-2 py-1 rounded shadow';
-            editButton.innerHTML = '<i class="fas fa-edit mr-1"></i>編集';
+            editButton.className = 'text-xs bg-blue-500 text-white px-2 py-1 rounded shadow';
+            editButton.innerHTML = '<i class="fas fa-edit"></i>';
+            editButton.title = '編集';
             editButton.onclick = (e) => this.startEditing(item.id, e);
             
             // Delete button - Always visible with text
             const deleteButton = document.createElement('button');
-            deleteButton.className = 'text-sm bg-red-500 text-white px-2 py-1 rounded shadow';
-            deleteButton.innerHTML = '<i class="fas fa-trash mr-1"></i>削除';
+            deleteButton.className = 'text-xs bg-red-500 text-white px-2 py-1 rounded shadow';
+            deleteButton.innerHTML = '<i class="fas fa-trash"></i>';
+            deleteButton.title = '削除';
             deleteButton.onclick = (e) => {
                 e.stopPropagation();
                 this.removeItem(item.id);
@@ -98,15 +100,12 @@ export class DumpList extends ListManager {
             
             // Move to Todo button
             const moveToTodoButton = document.createElement('button');
-            moveToTodoButton.type = 'button';
-            moveToTodoButton.className = 'text-green-500 hover:text-green-700 p-1 rounded-full hover:bg-green-50';
+            moveToTodoButton.className = 'text-xs bg-green-500 text-white px-2 py-1 rounded shadow';
             moveToTodoButton.innerHTML = '<i class="fas fa-arrow-right"></i>';
-            moveToTodoButton.title = 'ToDoに移動';
+            moveToTodoButton.title = 'ToDoへ移動';
             moveToTodoButton.onclick = (e) => {
                 e.stopPropagation();
-                e.preventDefault();
                 this.moveToTodo(item.id);
-                return false;
             };
             
             // Add action buttons
@@ -115,9 +114,11 @@ export class DumpList extends ListManager {
             actions.appendChild(moveToTodoButton);
             
             // Assemble the item
-            li.appendChild(content);
-            li.appendChild(actions);
-            fragment.appendChild(li);
+            itemElement.appendChild(content);
+            itemElement.appendChild(actions);
+            
+            // Add to fragment
+            fragment.appendChild(itemElement);
         });
     }
     
